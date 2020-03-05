@@ -15,30 +15,42 @@ Baselines:
 5.  Random-k sentences
 6.  k ROUGE sentences 
 
-###Running deep learning
-####Training
+### Running deep learning
+#### Training
 The models first have to be trained before they can be used for summarization. This requires gaining access to the BioASQ data. To do this, you have to register for an account at http://bioasq.org/participate.
 
-A script in provided in the data_processing directory to process the downloaded BioASQ data into a format suitable for training the models. 
-to download the pubmed articles for each snippet run
-python process_bioasq.py -d
-then to process the questions, answers, and snippets, run:
-python process_bioasq.py -p
-or to process all of this but join the snippets that are taken from the same
-abstract but are listed separately in the file:
-python process_bioasq.py -pj
+Once the bioasq data is downloaded, it should be placed in the data_processing/data directory in the cloned github repository, so that the path looks like data_processing/data/BioASQ-training7b/BioASQ-training7b/training7b.json. Note that the version of BioASQ may be changed at the time of downloaded and this will have to be fixed in the code.   
+Once the data is in the correct place, run the scripts:
+```
+python process_bioasq_data.py -d -p
+python prepare_training_data.py -bt --bart-bioasq --bioasq-sent
+```
+This will convert the bioasq data into an easier to use format, download the pubmed articles used as reference in the bioasq collection, and then prepare data for the three deep learning models. Include the --add-q option to create additional datasets with the question concatenated to the beginning of the documents, for question-driven summarization.   
+Then, prepare the MedInfo validation data for the Pointer-Generator and BART. This requires two commands:
+```
+python prepare_validation_data.py -t
+python prepare_validation_data.py
+```
+As before, it is optional to include the --add-q option.
+Now you are ready for training
+
+##### Pointer-Generator
+##### BART
+##### BiLSTM
 
 
-#####Pointer-Generator
-#####BART
-#####BiLSTM
-
-
-###Runnning baselines
+### Runnning baselines
 To run the baseline systems, all you have to do is
 ```
 python baselines.py --dataset=chiqa
 ```
 This will run the baseline summarization methods on the two summmarization tasks reported in the paper, as well as on the shorter passages.
 
-###Evaluation
+### Evaluation
+Once the models are training and the baselines have been run on the summarization datasets you are interested in evaluating, navigate to the evluation directory. To run the evaluation script on the summarization models' predictions, you have a few options:   
+For comparing all models on extractive and abstractive summaries of web pages:
+```
+```
+Or to run two versions of BART (question-driven approach and without questions) run
+```
+```
