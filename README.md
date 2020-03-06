@@ -12,9 +12,9 @@ Deep learning:
 3.  BART
 
 Baselines:
-4.  LEAD-k
-5.  Random-k sentences
-6.  k ROUGE sentences
+4.  LEAD-k   
+5.  Random-k sentences   
+6.  k ROUGE sentences   
 
 ### Running deep learning
 This code is set up to train and run inference with all models first, and then use the summarization_evaluation.py script to evaluate all results at once. This section describes the steps for training and inference.
