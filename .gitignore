@@ -1,1 +1,3 @@
 data_processing/data/BioASQ-training7b
+data_processing/data/MedQuAD-master
+data_processing/data/MedInfo2019-QA-Medications.xlsx

@@ -47,12 +47,8 @@ class MedInfo():
         """
         Load medinfo collection prepared in the process_medinfo.py script
         """
-        if args.medinfo_p2ax:
-            with open("data/medinfo_xml_collection.json", "r", encoding="utf-8") as f:
-                medinfo = json.load(f)
-        else:
-            with open("data/medinfo_collection.json", "r", encoding="utf-8") as f:
-                medinfo = json.load(f)
+        with open("data/medinfo_collection.json", "r", encoding="utf-8") as f:
+            medinfo = json.load(f)
 
         return medinfo
 
@@ -72,7 +68,7 @@ class MedInfo():
         {'question': {'summary': text, 'articles': text}}
         """
         dev_dict = {}
-        medinfo = self.load_collection()
+        medinfo = self._load_collection()
         data_pair = 0
         Q_END = " [QUESTION?] "
         for i, question in enumerate(medinfo):
@@ -90,18 +86,18 @@ class MedInfo():
                         article = question + Q_END + article
                     assert len(summary) <= (len(article) + 10)
                     if args.tag_sentences:
-                        summary = self.format_summary_sentences(summary)
-                        tag_string = "s-tags"
+                        summary = self._format_summary_sentences(summary)
+                        tag_string = "_s-tags"
                     else:
                         tag_string = ""
                     data_pair += 1
                     dev_dict[i] = {'question': question, 'summary': summary, 'articles': article}
             except AssertionError:
-                print("\n\n", "Answer longer than summary. Skipping element\narticle:", article ,"\n", "summary:", summary)
+                print("Answer longer than summary. Skipping element")
 
         print("Number of page-section pairs:", data_pair)
 
-        with open("data/medinfo_section2answer_validation_data{0}_{1}.json".format(self.q_name, tag_string), "w", encoding="utf-8") as f:
+        with open("data/medinfo_section2answer_validation_data{0}{1}.json".format(self.q_name, tag_string), "w", encoding="utf-8") as f:
             json.dump(dev_dict, f, indent=4)
 
 
@@ -109,7 +105,7 @@ def process_data():
     """
     Main function for saving data
     """
-    data_saver.save_section2answer_validation_data()
+    MedInfo().save_section2answer_validation_data()
 
 
 if __name__ == "__main__":

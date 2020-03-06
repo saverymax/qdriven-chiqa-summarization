@@ -24,8 +24,6 @@ Then copy the relevant chiqa and dailymed pages to a new directory
 python process_medinfo.py -cy
 and parse the data from those files and save as text:
 python process_medinfo.py -cp
-or parse and save as xml
-python process_medinfo.py -cpx
 """
 
 import json
@@ -64,10 +62,7 @@ def get_args():
                         dest="parse_files",
                         action="store_true",
                         help="Parse the sections from the relevant chiqa files")
-    parser.add_argument("-x",
-                        dest="save_xml",
-                        action="store_true",
-                        help="Save the xml as xml instead of text in the medinfo collection")
+
     return parser
 
 
@@ -96,7 +91,7 @@ class ProcessMedInfo():
         """
         Load and process medinfo excel data
         """
-        df = pd.read_excel("../data/MedInfo2019-QA-Medications.xlsx", encoding="latin", na_filter=False) # na_filter=false to deal with none-like stuff on my own
+        df = pd.read_excel("data/MedInfo2019-QA-Medications.xlsx", encoding="latin", na_filter=False) # na_filter=false to deal with none-like stuff on my own
         print("Shape of MedInfo data:", df.shape)
         self.nlp = spacy.load('en_core_web_sm')
         data_dict = {}
@@ -385,21 +380,16 @@ class ProcessCrawl():
 
         There is a directory for each source of information
         """
-        for f in glob.iglob("../data/crawl_download_asumm/*"):
+        for f in glob.iglob("data/MedQuAD-Master/*"):
             print("Directory: {}".format(f))
             for xml_file in glob.iglob("{f}/*.xml".format(f=f)):
                 self._copy_answer_pages(xml_file)
-        # Dailymed parsing:
-        print("DailyMed crawl:\n")
-        for xml_file in glob.iglob("../data/xml_dailymed_12072018/xml_dailymed/*.xml"):
-        #for xml_file in glob.iglob("../data/xml_dailymed_12072018/xml_dailymed/20160817_8ae4a0c1-1424-47a9-9a59-7fe38bedc0c7.xml"):
-            self._copy_answer_pages(xml_file)
 
     def parse_chiqa_files(self):
         """
-        Iterate through the xml in the answer summ collection created from the files in crawl_download and in the dailymed crawl
+        Iterate through the xml in MedQuAD crawl
         """
-        for xml_file in glob.iglob("../data/medinfo_answer_summ_collection/*.xml"):
+        for xml_file in glob.iglob("data/medinfo_answer_collection*.xml"):
             if args.save_xml:
                 self._process_xml_collection(xml_file)
             else:

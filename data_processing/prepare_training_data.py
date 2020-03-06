@@ -176,7 +176,7 @@ class BioASQ():
                 training_data_dict[snip_id]['labels'] = labels
                 snip_id += 1
 
-        with open("data/sentence_classification/bioasq_abs2summ_binary_sent_classification_thresh_9_training.json", "w", encoding="utf=8") as f:
+        with open("data/bioasq_abs2summ_binary_sent_classification_training.json", "w", encoding="utf=8") as f:
             json.dump(training_data_dict, f, indent=4)
         # For each sentence in each abstract, compare it to each sentence in answer. Record the best rouge score.
 
