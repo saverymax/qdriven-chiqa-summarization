@@ -1,6 +1,24 @@
 # Question-Driven Summarization of Answers to Consumer Health Questions
 This repository contains the code to process the data and run the answer summarization systems presented in the paper Question-Driven Summarization of Answers to Consumer Health Questions
 
+## Environment
+Create a new environment and install the dependencies for the project:
+```
+conda create -n qdriven_env python=3.7
+conda activate qdriven_env
+pip install -r requirements.txt
+```
+The spacy tokenizer model will be handy later on as well
+```
+python -m spacy download en_core_web_sm
+```
+And because py-rouge uses nltk, we also need to do this:
+```
+python
+>>> import nltk
+>>> nltk.download('punkt')
+```
+
 ## Data Processing
 Download MEDIQA-AnS from https://doi.org/10.17605/OSF.IO/FYG46 to the evaluation/data directory in this repository.
 
@@ -11,7 +29,7 @@ Deep learning:
 2.  Pointer Generator
 3.  BART
 
-Baselines:
+Baselines:   
 4.  LEAD-k   
 5.  Random-k sentences   
 6.  k ROUGE sentences   
@@ -26,21 +44,21 @@ Once the bioasq data is downloaded, it should be placed in the data_processing/d
 
 Once the data is in the correct place, run the following scripts:
 ```
-python process_bioasq_data.py -d -p
+python process_bioasq_data.py -p
 python prepare_training_data.py -bt --bart-bioasq --bioasq-sent
 ```
-This will download the pubmed articles used as reference in the bioasq collection, and prepare separate training sets for the three deep learning models. Include the ```--add-q``` option to create additional datasets with the question concatenated to the beginning of the documents, for question-driven summarization.
+This will prepare separate training sets for the three deep learning models. Include the ```--add-q``` option to create additional datasets with the question concatenated to the beginning of the documents, for question-driven summarization.
 
 Note: Not sure if I am going to include this processing step.
+Just make sure to give credence to medinfo
 Then, prepare the MedInfo validation data for the Pointer-Generator and BART.
 First download the .xlsx MedInfo file at https://github.com/abachaa/Medication_QA_MedInfo2019
 
-To prepare the MedInfo validation data for the Pointer-Generator and BART:
+To prepare the MedInfo validation data for the Pointer-Generator:
 ```
-python prepare_validation_data.py -t
-python prepare_validation_data.py
+python prepare_validation_data.py --pg --bart
 ```
-It is optional to include the --add-q option.
+It is optional to include the --add-q option.   
 Now you are ready for training and inference.
 
 #### Pointer-Generator

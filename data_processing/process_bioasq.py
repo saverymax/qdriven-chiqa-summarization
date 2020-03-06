@@ -20,9 +20,6 @@ import glob
 from collections import Counter
 
 import numpy as np
-import spacy
-
-import PubMedClient
 
 
 def get_args():
@@ -39,11 +36,6 @@ def get_args():
                         dest="join_snippets",
                         action="store_true",
                         help="Join the snippets from the same abstract")
-    parser.add_argument("-d",
-                        dest="download",
-                        action="store_true",
-                        help="Download bioasq pubmed articles")
-
     return parser
 
 
@@ -109,8 +101,6 @@ class BioASQ():
             for snippet in q['snippets']:
                 pmid_match = False
                 snippet_dict[q['body']].append(snippet['text'])
-                if q['body'] == "List signaling molecules (ligands) that interact with the receptor EGFR?":
-                    print(snippet_dict[q['body']])
                 doc_pmid = str(snippet['document'].split("/")[-1])
                 if args.join_snippets:
                     # If the abstract has already been processed along with its snippet
@@ -135,7 +125,6 @@ class BioASQ():
                         # Add the data to the dictionary containing the collection.
                         bioasq_collection[q['body']]['snippets'].append({'snippet': snippet['text'], 'article': article, 'pmid': doc_pmid})
                 except KeyError as e:
-                    print("No article found for this snippet", e)
                     continue
 
         with open("data/bioasq_ideal_answers.json", "w", encoding="utf8") as f:
@@ -149,86 +138,12 @@ class BioASQ():
             with open("data/bioasq_collection.json", "w", encoding="utf8") as f:
                 json.dump(bioasq_collection, f, indent=4)
 
-    def get_bioasq_docs(self):
-        """
-        Download and save bioasq articles, for use while processing other parts of bioasq data.
-        """
-        bioasq_questions = self._load_bioasq()
-        documents = {}
-        for i, q in enumerate(bioasq_questions):
-            pmid_list= [d.split("/")[-1] for d in q['documents']]
-            result = self._download_bioasq_docs(pmid_list)
-            # 27924029 is the only document for one question, and
-            # is no longer in pubmed.
-            if result is None:
-                pass
-            else:
-                if len(result) != len(pmid_list):
-                    for i in pmid_list:
-                        if i not in result:
-                            print("No article returned fron PubMed, or missing title/abstract: ", i)
-                documents.update(result)
-
-        with open("data/bioasq_pubmed_articles.json", "w", encoding="utf8") as f:
-            json.dump(documents, f, indent=4)
-
-    def _download_bioasq_docs(self, pmid_list):
-        """
-        If command line argument included, download the documents specified by BioASQ
-        """
-        history = "n"
-        query = "[UID] OR ".join(pmid_list)
-        query += "[UID]"
-        id_cnt=0
-        doc_dict = {}
-
-        downloader = PubMedClient.CitationDownloader()
-        search_results = downloader.search_entrez(query, history)
-
-        if search_results is None:
-           print("No ids")
-           print(pmid_list)
-           return None
-
-        if history == "y":
-            fetched_results = downloader.fetch_with_history(search_results)
-        elif history == "n":
-            fetched_results = downloader.fetch_without_history(search_results)
-
-        for citation in fetched_results:
-            try:
-                pmid = citation.find(".//PMID").text
-                id_cnt+=1
-                title = citation.find(".//ArticleTitle")
-                if title is not None:
-                    title = le.tostring(title, encoding='unicode', method='text').strip().replace("\n", " ")
-                else:
-                    title = ""
-                    print("No title", pmid)
-                    continue
-                abstract = citation.find(".//Abstract")
-                if abstract is not None:
-                    abstract = le.tostring(abstract, encoding='unicode', method='text').strip().replace("\n", " ")
-                else:
-                    abstract = ""
-                    print("No abstract", pmid)
-                    continue
-                text =  title + " " + abstract
-                doc_dict[pmid] = text
-
-            except Exception as e:
-                raise e
-
-        return doc_dict
-
-
+    
 def process_bioasq():
     """
     Main processing function for bioasq data
     """
     bq = BioASQ()
-    if args.download:
-        bq.get_bioasq_docs()
     if args.process:
         bq.bioasq()
 

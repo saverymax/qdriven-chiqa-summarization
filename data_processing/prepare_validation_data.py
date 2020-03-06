@@ -19,10 +19,14 @@ def get_args():
     Argument defnitions
     """
     parser = argparse.ArgumentParser(description="Arguments for data exploration")
-    parser.add_argument("-t",
-                        dest="tag_sentences",
+    parser.add_argument("--pg",
+                        dest="pg",
                         action="store_true",
                         help="tag the sentences with <s> and </s>, for use with pointer generator network")
+    parser.add_argument("--bart",
+                        dest="bart",
+                        action="store_true",
+                        help="Prepare data for BART")
     parser.add_argument("--add-q",
                         dest="add_q",
                         action="store_true",
@@ -60,11 +64,10 @@ class MedInfo():
         summary = " ".join(["<s> {s} </s>".format(s=s.text.strip()) for s in tokenized_abs.sents])
         return summary
 
-    def save_section2answer_validation_data(self):
+    def save_section2answer_validation_data(self, tag_sentences):
         """
         For questions that have a corresponding section-answer pair, save the
-        validation data in following format, keeping the same summary and article keys
-        as the other datasets:
+        validation data in following format 
         {'question': {'summary': text, 'articles': text}}
         """
         dev_dict = {}
@@ -85,7 +88,7 @@ class MedInfo():
                     if args.add_q:
                         article = question + Q_END + article
                     assert len(summary) <= (len(article) + 10)
-                    if args.tag_sentences:
+                    if tag_sentences:
                         summary = self._format_summary_sentences(summary)
                         tag_string = "_s-tags"
                     else:
@@ -105,8 +108,11 @@ def process_data():
     """
     Main function for saving data
     """
-    MedInfo().save_section2answer_validation_data()
-
+    # Run once for each 
+    if args.pg:
+        MedInfo().save_section2answer_validation_data(tag_sentences=True)
+    if args.bart:
+        MedInfo().save_section2answer_validation_data(tag_sentences=False)
 
 if __name__ == "__main__":
     global args

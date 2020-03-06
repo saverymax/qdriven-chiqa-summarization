@@ -1,0 +1,6 @@
+lxml
+numpy
+spacy
+sklearn
+py-rouge
+nltk

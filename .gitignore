@@ -1,3 +1,12 @@
 data_processing/data/BioASQ-training7b
 data_processing/data/MedQuAD-master
 data_processing/data/MedInfo2019-QA-Medications.xlsx
+data_processing/bart/*.*
+*multi*.json
+*single*.json
+question_driven_answer_summarization_primary_dataset.json
+bioasq_collection.json
+bioasq_ideal_answers.json
+bioasq_snippets.json
+medinfo_section*.json
+bioasq_abs2summ_training_data_without_question.json
