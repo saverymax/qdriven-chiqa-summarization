@@ -1,7 +1,4 @@
-# script for running inference with BART model finetuned on 
-sent_class_dir=/data/saveryme/asumm/models/sentence_classifier/medsumm_bioasq_abs2summ/dropout_5_sent_200_tok_50_val_20_d_256_l2_reg_binary
-k=10
-
+#!/bin/bash
 for q in with_question without_question
 do
     model_config=/data/saveryme/asumm/asumm_data/training_data/bart/${q}/bart-bin

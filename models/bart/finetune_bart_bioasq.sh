@@ -8,15 +8,15 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --time=2-00:00:00
 
-TOTAL_NUM_UPDATES=20000  
-WARMUP_UPDATES=500      
+TOTAL_NUM_UPDATES=20000
+WARMUP_UPDATES=500
 LR=3e-05
 MAX_TOKENS=1024
 UPDATE_FREQ=16
 BART_PATH=bart/bart.large/model.pt
 checkpoint_path=checkpoints_bioasq_$SLURM_JOB_ID
 q_string=without_question
-asumm_data=/data/saveryme/asumm/asumm_data/training_data/bart/${q_string}/bart-bin
+asumm_data=../../data/${q_string}/bart-bin
 
 CUDA_VISIBLE_DEVICES=0,1,2 python train.py ${asumm_data} \
     --restore-file $BART_PATH \
