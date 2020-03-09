@@ -12,10 +12,12 @@ data_processing/bioasq_abs2summ_training_data_without_question.json
 data_processing/bioasq_abs2summ_training_data_with_question.json
 data_processing/data/bart/with_question/
 data_processing/data/bart/without_question/
-evaluation/data/pointer_generator/chiqa_eval/*
-evaluation/data/bart/chiqa_eval/*
-evaluation/data/sentence_classifier/chiqa_eval/*
-evaluation/data/baselines/chiqa_eval/*
+data_processing/data/bioasq_abs2summ_binary_sent_classification_training.json
+data_processing/data/bioasq_abs2summ_training_data_without_question.json
+data_processing/data/bioasq_snippets.json
+data_processing/data/medinfo_section2answer_validation_data_without_question.json
+data_processing/data/medinfo_section2answer_validation_data_without_question_s-tags.json
+models/pointer_generator/bioasq_abs2summ*
 models/bart/dict.txt
 models/bart/encoder.json
 models/bart/vocab.bpe

@@ -23,7 +23,7 @@ python
 Download MEDIQA-AnS from https://doi.org/10.17605/OSF.IO/FYG46 to the evaluation/data directory in this repository.
 
 ## Answer Summarization
-In the models directory, there are six systems:
+In the models directory, there are six systems:   
 Deep learning:
 1.  BiLSTM
 2.  Pointer Generator
@@ -88,7 +88,7 @@ Other experiments can be run configuring the script to generate summaries for th
 
 
 #### BART
-Install the fairseq library and download BART into the bart directory in this repository. We have provided a simple script to download BART.
+Install the fairseq library and download BART into the bart directory in this repository. 
 ```
 wget https://dl.fbaipublicfiles.com/fairseq/models/bart.large.tar.gz
 tar -xzvf bart.large.tar.gz
