@@ -285,7 +285,8 @@ def get_decode_dir_name(ckpt_name):
   if "train" in FLAGS.data_path: dataset = "train"
   elif "val" in FLAGS.data_path: dataset = "val"
   elif "test" in FLAGS.data_path: dataset = "test"
-  else: raise ValueError("FLAGS.data_path %s should contain one of train, val or test" % (FLAGS.data_path))
+  elif "summ" in FLAGS.data_path: dataset = "test"
+  else: raise ValueError("FLAGS.data_path %s should contain one of train, val, test, or summ" % (FLAGS.data_path))
   dirname = "decode_%s_%imaxenc_%ibeam_%imindec_%imaxdec" % (dataset, FLAGS.max_enc_steps, FLAGS.beam_size, FLAGS.min_dec_steps, FLAGS.max_dec_steps)
   if ckpt_name is not None:
     dirname += "_%s" % ckpt_name

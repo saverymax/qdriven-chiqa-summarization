@@ -8,14 +8,8 @@ word2 n_occurences
 ...
 wordn n_occurences
 
-Make sure the sentences are not yet tagged with <s> </s>
-
-To create medlineplus health topics vocab:
-python make_asumm_pg_vocab.py --vocab_path data/health_topics_vocab --data_file data/medlineplus_training_data.json
-Bioasq abstract to snippet with [END] tag:
-python make_asumm_pg_vocab.py --vocab_path data/bioasq_abs2summ_vocab --data_file data/bioasq_abs2summ_training_data.json
-Bioasq abstracts to single answer with [END] tag:
-python make_asumm_pg_vocab.py --vocab_path data/bioasq_abs2ans_vocab --data_file data/bioasq_abs2ans_training_data.json
+To run:
+python make_asumm_pg_vocab.py --vocab_path=bioasq_abs2summ_vocab --data_file=../../data_process/data/bioasq_abs2summ_training_data_without_question.json
 """
 
 from collections import Counter

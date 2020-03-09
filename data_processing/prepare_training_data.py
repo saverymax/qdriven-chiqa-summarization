@@ -18,6 +18,7 @@ python prepare_training_data.py --bioasq-sent
 import json
 import argparse
 import re
+import os
 
 from sklearn.utils import shuffle as sk_shuffle
 import rouge
@@ -185,20 +186,25 @@ class BioASQ():
         Write the train and val data to file so that the processor and tokenizer for bart will read it, as per fairseqs design
         """
         bioasq_collection = self._load_bioasq()
-        # Additiona to name of file is adding the question to the beginnign of the abstract text
+        # Additional string is added to the question of the beginning of the abstract text
         if args.add_q:
-            q_name = "_with_question"
+            q_name = "with_question"
         else:
-            q_name = "_without_question"
+            q_name = "without_question"
 
         # Open medinfo data preprocessed in prepare_validation_data.py
-        with open("data/medinfo_section2answer_validation_data{}.json".format(q_name), "r", encoding="utf-8") as f:
+        with open("data/medinfo_section2answer_validation_data_{}.json".format(q_name), "r", encoding="utf-8") as f:
             medinfo_val = json.load(f)
 
-        train_src = open("data/bart/bart.train{}.source".format(q_name), "w", encoding="utf8")
-        train_tgt = open("data/bart/bart.train{}.target".format(q_name), "w", encoding="utf8")
-        val_src = open("data/bart/bart.val{}.source".format(q_name), "w", encoding="utf8")
-        val_tgt = open("data/bart/bart.val{}.target".format(q_name), "w", encoding="utf8")
+        try:
+            os.mkdir("data/bart/{}".format(q_name))
+        except FileExistsError:
+            print("Directory ", q_name , " already exists")
+
+        train_src = open("data/bart/{q}/bart.train_{q}.source".format(q=q_name), "w", encoding="utf8")
+        train_tgt = open("data/bart/{q}/bart.train_{q}.target".format(q=q_name), "w", encoding="utf8")
+        val_src = open("data/bart/{q}/bart.val_{q}.source".format(q=q_name), "w", encoding="utf8")
+        val_tgt = open("data/bart/{q}/bart.val_{q}.target".format(q=q_name), "w", encoding="utf8")
         snippets_list = []
         abstracts_list = []
         for i, q in enumerate(bioasq_collection):
@@ -237,10 +243,10 @@ class BioASQ():
         val_tgt.close()
 
         # Make sure there were no funny newlines added
-        train_src = open("data/bart/bart.train{}.source".format(q_name), "r", encoding="utf8").readlines()
-        train_tgt = open("data/bart/bart.train{}.target".format(q_name), "r", encoding="utf8").readlines()
-        val_src = open("data/bart/bart.val{}.source".format(q_name), "r", encoding="utf8").readlines()
-        val_tgt = open("data/bart/bart.val{}.target".format(q_name), "r", encoding="utf8").readlines()
+        train_src = open("data/bart/{q}/bart.train_{q}.source".format(q=q_name), "r", encoding="utf8").readlines()
+        train_tgt = open("data/bart/{q}/bart.train_{q}.target".format(q=q_name), "r", encoding="utf8").readlines()
+        val_src = open("data/bart/{q}/bart.val_{q}.source".format(q=q_name), "r", encoding="utf8").readlines()
+        val_tgt = open("data/bart/{q}/bart.val_{q}.target".format(q=q_name), "r", encoding="utf8").readlines()
         print("Number of snippets: ", snp_cnt)
         assert len(train_src) == snp_cnt, len(train_src)
         assert len(train_tgt) == snp_cnt

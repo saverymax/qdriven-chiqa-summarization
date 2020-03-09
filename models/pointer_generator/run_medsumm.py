@@ -38,7 +38,7 @@ FLAGS = tf.app.flags.FLAGS
 
 # Define whether to use answer summarization processing pipeline or original pipeline for CNN data:
 tf.app.flags.DEFINE_boolean('medsumm', True, "Definition for answer summarization data processing")
-tf.app.flags.DEFINE_boolean('question_driven', True, "Add question to beginning of text for question-driven summ. Option only for inference, as the training datasets are prepared appropriately")
+tf.app.flags.DEFINE_boolean('question_driven', True, "Add question to beginning of text for question-driven summ. Option only applied for inference, as the training datasets are prepared appropriately")
 tf.app.flags.DEFINE_boolean('tag_sentences', False, "Add sentences to summaries when data processing for inference. All this does is allow the code to return the ref summaries properly.")
 
 # Where to find data

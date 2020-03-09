@@ -30,9 +30,9 @@ Deep learning:
 3.  BART
 
 Baselines:   
-4.  LEAD-k   
-5.  Random-k sentences   
-6.  k ROUGE sentences   
+1.  LEAD-k   
+2.  Random-k sentences   
+3.  k ROUGE sentences   
 
 ### Running deep learning
 This code is set up to train and run inference with all models first, and then use the summarization_evaluation.py script to evaluate all results at once. This section describes the steps for training and inference.
@@ -47,60 +47,69 @@ Once the data is in the correct place, run the following scripts:
 python process_bioasq_data.py -p
 python prepare_training_data.py -bt --bart-bioasq --bioasq-sent
 ```
-This will prepare separate training sets for the three deep learning models. Include the ```--add-q``` option to create additional datasets with the question concatenated to the beginning of the documents, for question-driven summarization.
+This will prepare separate training sets for the three deep learning models. Include the ```--add-q``` option to create additional datasets with the question concatenated to the beginning of the documents, for question-driven summarization. This step will take a while to finish.
 
 Note: Not sure if I am going to include this processing step.
 Just make sure to give credence to medinfo
 Then, prepare the MedInfo validation data for the Pointer-Generator and BART.
 First download the .xlsx MedInfo file at https://github.com/abachaa/Medication_QA_MedInfo2019
 
-To prepare the MedInfo validation data for the Pointer-Generator:
+To prepare the MedInfo validation data for the Pointer-Generator and BART. The BiLSTM does not need the MedInfo data:
 ```
 python prepare_validation_data.py --pg --bart
 ```
-It is optional to include the --add-q option.   
+Again, it is optional to include the --add-q option.   
 Now you are ready for training and inference.
 
 #### Pointer-Generator
+Add environment details
 The Python 3 version of the Pointer-Generator code from https://github.com/becxer/pointer-generator/ (forked from https://github.com/abisee/pointer-generator) is provided in the models/pointer_generator directory here. The code has been customized to support answer summarization data processing steps, involving changes to data.py, batcher.py, decode.py, and run_summarization.py. However, the model (in model.py) remains the same.
 
-To use the Pointer-Generator, you will have to run ```make_asumm_pg_vocab.py``` first, to prepare the BioASQ vocab. Then, to train, you will need to run two jobs: One to train, and the other to evaluate the checkpoints simultaneously. Run these commands independently, on two different GPU nodes:
+To use the Pointer-Generator, from the pointer_generator directory you will have to run 
+```
+python make_asumm_pg_vocab.py --vocab_path=bioasq_abs2summ_vocab --data_file=../../data_processing/data/bioasq_abs2summ_training_data_without_question.json
+```
+first, to prepare the BioASQ vocab. This is an important step, and make sure that you create the vocab WITH the [QUESTION?] tag if you are focusing on question-driven summarization. This is done simply by first creating the BioASQ data with the --add-q option.  
+
+Then, to train, you will need to run two jobs: One to train, and the other to evaluate the checkpoints simultaneously. Run these commands independently, on two different GPU nodes:
 ```
 bash train_medsumm.sh
 bash eval_medsumm.sh
 ```
-If you have access to a computing cluster that uses slurm, you may find it useful to use sbatch to submit these jobs.
+If you have access to a computing cluster that uses slurm, you may find it useful to use sbatch to submit these jobs.   
 You will have to monitor the training of the Pointer-Generator via tensorboard and manually end the job once the loss has satisfactorily converged. The checkpoint that best performs on the MedInfo validation set will be saved to variable-name-of-experiment-directory/eval/checkpoint_best
 
-Once it is properly trained, run inference with
+Once it is properly trained (the MEDIQA-AnS paper reports results after 10,000 training steps), run inference on full text with the web pages with
 ```
 run_chiqa.sh
 ```
 The single pass decoding in the original Pointer-Generator code is quite slow, and it will unfortunately take approximately 45 minutes per dataset to perform inference.
+Other experiments can be run configuring the script to generate summaries for the passages or multi-document datasets as well.
 
 
 #### BART
 Install the fairseq library and download BART into the bart directory in this repository. We have provided a simple script to download BART.
 ```
 wget https://dl.fbaipublicfiles.com/fairseq/models/bart.large.tar.gz
+tar -xzvf bart.large.tar.gz
 pip install fairseq
 ```
 Once you have fairseq installed and BART downloaded to the bart directory, there are a few steps you have to take to get the bioasq in suitable format for finetuning BART.
 First, run
 ```
-process_bioasq_data.sh -b -f
+bash process_bioasq_data.sh -b -f
 ```
 This will prepare the byte-pair encodings and run the fairseq preprocessing. Once the processing is complete, you can finetune BART with
 ```
-finetune_bart_bioasq.sh
+bash finetune_bart_bioasq.sh without_question
 ```
-The larger your computing cluster, the faster you will be able to train. For the experiments presented in the paper, we trained BART for two days on three V100-SXM2 GPUs with 32GB of memory each.
+If you have been testing question-driven summarization, include with_question instead. The larger your computing cluster, the faster you will be able to train. For the experiments presented in the paper, we trained BART for two days on three V100-SXM2 GPUs with 32GB of memory each.
 
 Once you have finetuned the model, run inference on the MEDIQA-AnS dataset with
 ```
-run_chiqa.sh
+bash run_chiqa.sh
 ```
-It may take a while to run through all the datasets set up in the bash script.
+
 
 #### BiLSTM
 This is quite a bit easier to train than the previous two models. Just run
@@ -109,7 +118,7 @@ train_sentence_classifier.sh
 ```
 The training script will automatically save the checkpoint the performs that best on the validation set. The training will end after 10 epochs. The training script is configured for TensorBoard and you can monitor the loss by running tensorboard in the medsumm_bioasq_abs2summ directory.
 
-Once the BiLSTM is trained, to run the model on all single document summarization tasks in MEDIQA-Ans, run
+Once the BiLSTM is trained, the following script is provided to run the model on all single document summarization tasks in MEDIQA-Ans:
 ```
 run_chiqa.sh
 ```
