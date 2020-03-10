@@ -197,14 +197,14 @@ class BioASQ():
             medinfo_val = json.load(f)
 
         try:
-            os.mkdir("data/bart/{}".format(q_name))
+            os.mkdir("../models/bart/bart_config/{}".format(q_name))
         except FileExistsError:
             print("Directory ", q_name , " already exists")
 
-        train_src = open("data/bart/{q}/bart.train_{q}.source".format(q=q_name), "w", encoding="utf8")
-        train_tgt = open("data/bart/{q}/bart.train_{q}.target".format(q=q_name), "w", encoding="utf8")
-        val_src = open("data/bart/{q}/bart.val_{q}.source".format(q=q_name), "w", encoding="utf8")
-        val_tgt = open("data/bart/{q}/bart.val_{q}.target".format(q=q_name), "w", encoding="utf8")
+        train_src = open("../models/bart/bart_config/{q}/bart.train_{q}.source".format(q=q_name), "w", encoding="utf8")
+        train_tgt = open("../models/bart/bart_config/{q}/bart.train_{q}.target".format(q=q_name), "w", encoding="utf8")
+        val_src = open("../models/bart/bart_config/{q}/bart.val_{q}.source".format(q=q_name), "w", encoding="utf8")
+        val_tgt = open("../models/bart/bart_config/{q}/bart.val_{q}.target".format(q=q_name), "w", encoding="utf8")
         snippets_list = []
         abstracts_list = []
         for i, q in enumerate(bioasq_collection):
@@ -243,10 +243,10 @@ class BioASQ():
         val_tgt.close()
 
         # Make sure there were no funny newlines added
-        train_src = open("data/bart/{q}/bart.train_{q}.source".format(q=q_name), "r", encoding="utf8").readlines()
-        train_tgt = open("data/bart/{q}/bart.train_{q}.target".format(q=q_name), "r", encoding="utf8").readlines()
-        val_src = open("data/bart/{q}/bart.val_{q}.source".format(q=q_name), "r", encoding="utf8").readlines()
-        val_tgt = open("data/bart/{q}/bart.val_{q}.target".format(q=q_name), "r", encoding="utf8").readlines()
+        train_src = open("../models/bart/bart_config/{q}/bart.train_{q}.source".format(q=q_name), "r", encoding="utf8").readlines()
+        train_tgt = open("../models/bart/bart_config/{q}/bart.train_{q}.target".format(q=q_name), "r", encoding="utf8").readlines()
+        val_src = open("../models/bart/bart_config/{q}/bart.val_{q}.source".format(q=q_name), "r", encoding="utf8").readlines()
+        val_tgt = open("../models/bart/bart_config/{q}/bart.val_{q}.target".format(q=q_name), "r", encoding="utf8").readlines()
         print("Number of snippets: ", snp_cnt)
         assert len(train_src) == snp_cnt, len(train_src)
         assert len(train_tgt) == snp_cnt

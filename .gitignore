@@ -10,8 +10,6 @@ data_processing/bioasq_snippets.json
 data_processing/medinfo_section*.json
 data_processing/bioasq_abs2summ_training_data_without_question.json
 data_processing/bioasq_abs2summ_training_data_with_question.json
-data_processing/data/bart/with_question/
-data_processing/data/bart/without_question/
 data_processing/data/bioasq_abs2summ_binary_sent_classification_training.json
 data_processing/data/bioasq_abs2summ_training_data_without_question.json
 data_processing/data/bioasq_snippets.json
@@ -23,3 +21,6 @@ models/bart/encoder.json
 models/bart/vocab.bpe
 models/bart/checkpoints*
 models/bart/bart.large
+models/bart/bart_config/without_question/*
+models/bart/bart_config/with_question/*
+models/bilstm/medsumm*

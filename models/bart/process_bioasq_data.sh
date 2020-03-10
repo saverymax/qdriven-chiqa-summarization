@@ -13,7 +13,7 @@ echo "Args: $@"
 for q_string in without_question
 do 
     echo ${q_string}
-    asumm_data=../../data_processing/data/bart/${q_string}
+    asumm_data=bart_config/${q_string}
     echo asumm_data
     if [ "$1" == "-b" ]
     then

@@ -83,7 +83,7 @@ Once it is properly trained (the MEDIQA-AnS paper reports results after 10,000 t
 ```
 run_chiqa.sh
 ```
-The single pass decoding in the original Pointer-Generator code is quite slow, and it will unfortunately take approximately 45 minutes per dataset to perform inference.
+The question driven option can be changed in the bash script. Note that the single pass decoding in the original Pointer-Generator code is quite slow, and it will unfortunately take approximately 45 minutes per dataset to perform inference.
 Other experiments can be run configuring the script to generate summaries for the passages or multi-document datasets as well.
 
 
@@ -103,12 +103,13 @@ This will prepare the byte-pair encodings and run the fairseq preprocessing. Onc
 ```
 bash finetune_bart_bioasq.sh without_question
 ```
-If you have been testing question-driven summarization, include with_question instead. The larger your computing cluster, the faster you will be able to train. For the experiments presented in the paper, we trained BART for two days on three V100-SXM2 GPUs with 32GB of memory each.
+If you have been testing question-driven summarization, include with_question instead. The larger your computing cluster, the faster you will be able to train. For the experiments presented in the paper, we trained BART for two days on three V100-SXM2 GPUs with 32GB of memory each. The bash script provided here is currently configured to run with one GPU; however, the fairseq library supports multi-gpu training. 
 
 Once you have finetuned the model, run inference on the MEDIQA-AnS dataset with
 ```
 bash run_chiqa.sh
 ```
+For convenience, we have also included a finetuned BART model available at X. Once you have downloaded this and placed it in the models/bart/<checkpoint-for-experient> directory, you can run inference.
 
 
 #### BiLSTM

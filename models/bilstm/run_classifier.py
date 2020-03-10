@@ -62,7 +62,6 @@ def run_training(model, x_train, y_train, x_val, y_val):
     """
     logging.info("Beginning training\n")
     tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=FLAGS.tensorboard_log, update_freq=5000, profile_batch=0)
-    #early_stop_callback = EarlyStopping(monitor='val_loss', patience=5, verbose=0),
     checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
         filepath='{0}/{1}'.format(FLAGS.tensorboard_log, FLAGS.model_path),
         # overwrite current checkpoint if `val_loss` has improved.

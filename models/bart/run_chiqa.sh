@@ -1,11 +1,11 @@
 #!/bin/bash
-model_config=../../data_processing/bart/chiqa_eval/${1}/bart-bin
+model_config=bart_config/${1}/bart-bin
 model_path=checkpoints_bioasq_$1
 for summ_task in page2answer section2answer
 do
     for summ_type in single_abstractive single_extractive
     do
-        data=chiqa_${summ_task}_${summ_type}.json
+        data=${summ_task}_${summ_type}_summ.json
         input_file=../../data_processing/data/${data}
         prediction_file=bart_chiqa_${1}_${summ_task}_${summ_type}.json
         prediction_path=../../evaluation/data/bart/chiqa_eval/${prediction_file}
