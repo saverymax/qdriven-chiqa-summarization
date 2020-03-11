@@ -141,6 +141,7 @@ conda activate tf1_env
 wget https://files.pythonhosted.org/packages/cb/4d/c9c4da41c6d7b9a4949cb9e53c7032d7d9b7da0410f1226f7455209dd962/tensorflow_gpu-1.2.0-cp36-cp36m-manylinux1_x86_64.whl
 pip install tensorflow_gpu-1.2.0-cp36-cp36m-manylinux1_x86_64.whl 
 pip install -r requirements.txt
+python -m spacy download en_core_web_sm
 ```
 The tensorflow 1.2.0 version is only availble via download from the pypi.org.   
 To train the model, you will have to install cuDNN X and CUDA X. Once these are configured on your machine, you are ready for training.
@@ -154,8 +155,8 @@ first, to prepare the BioASQ vocab. This is an important step, and make sure tha
 
 Then, to train, you will need to run two jobs: One to train, and the other to evaluate the checkpoints simultaneously. Run these commands independently, on two different GPU nodes:
 ```
-bash train_medsumm.sh
-bash eval_medsumm.sh
+bash train_medsumm.sha without_question
+bash eval_medsumm.sha without_question
 ```
 If you have access to a computing cluster that uses slurm, you may find it useful to use sbatch to submit these jobs.   
 You will have to monitor the training of the Pointer-Generator via tensorboard and manually end the job once the loss has satisfactorily converged. The checkpoint that best performs on the MedInfo validation set will be saved to variable-name-of-experiment-directory/eval/checkpoint_best
