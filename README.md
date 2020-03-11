@@ -1,27 +1,27 @@
 # Question-Driven Summarization of Answers to Consumer Health Questions
 This repository contains the code to process the data and run the answer summarization systems presented in the paper Question-Driven Summarization of Answers to Consumer Health Questions
+If you are interested in just downloading the data, please refer to https://doi.org/10.17605/OSF.IO/FYG46. However, if you are interested in repeating the experiments reported in the paper, clone this repository and move the data found at https://doi.org/10.17605/OSF.IO/FYG46 to the evaluation/data directory.
 
 ## Environment
-Create a new environment and install the dependencies for the project.:
+To train the models and run the experiments, you will need to set up a few environments: one for data processing and evaluation; the BiLSTM; BART; and the Pointer-Generator. Since we are going to be processing the data first, create the following environment to install the data processing and evaluation dependencies
 ```
 conda create -n qdriven_env python=3.7
 conda activate qdriven_env
 pip install -r requirements.txt
 ```
+The requirements.txt file is found in the base directory of this repository.   
 The spacy tokenizer model will be handy later on as well
 ```
 python -m spacy download en_core_web_sm
 ```
-And because py-rouge uses nltk, we also need to do this:
+And because py-rouge uses nltk, we also need nltk:
 ```
 python
 >>> import nltk
 >>> nltk.download('punkt')
 ```
-There are more details on the environments required to train each model in the deep learning section.
+There are more details on the environments required to train each model in the following sections.
 
-## Data Processing
-Download MEDIQA-AnS from https://doi.org/10.17605/OSF.IO/FYG46 to the evaluation/data directory in this repository.
 
 ## Answer Summarization
 In the models directory, there are six systems:   
@@ -35,8 +35,18 @@ Baselines:
 2.  Random-k sentences   
 3.  k ROUGE sentences   
 
+
+### Runnning baselines
+Running the baselines is simple and can done while the qdriven_env is active.
+```
+python baselines.py --dataset=chiqa
+```
+This will run the baseline summarization methods on the two summmarization tasks reported in the paper, as well as on the shorter passages. k (number of sentences selected by the baselines) can be changed in the script.
+
+
 ### Running deep learning
 This code is set up to train and run inference with all models first, and then use the summarization_evaluation.py script to evaluate all results at once. This section describes the steps for training and inference.
+
 
 #### Training Preprocessing
 The models first have to be trained before they can be used for summarization. This requires gaining access to the BioASQ data. To do this, you have to register for an account at http://bioasq.org/participate.
@@ -62,31 +72,6 @@ python prepare_validation_data.py --pg --bart
 Again, it is optional to include the --add-q option.   
 Now you are ready for training and inference.
 
-#### Pointer-Generator
-Add environment details
-The Python 3 version of the Pointer-Generator code from https://github.com/becxer/pointer-generator/ (forked from https://github.com/abisee/pointer-generator) is provided in the models/pointer_generator directory here. The code has been customized to support answer summarization data processing steps, involving changes to data.py, batcher.py, decode.py, and run_summarization.py. However, the model (in model.py) remains the same.
-
-To use the Pointer-Generator, from the pointer_generator directory you will have to run 
-```
-python make_asumm_pg_vocab.py --vocab_path=bioasq_abs2summ_vocab --data_file=../../data_processing/data/bioasq_abs2summ_training_data_without_question.json
-```
-first, to prepare the BioASQ vocab. This is an important step, and make sure that you create the vocab WITH the [QUESTION?] tag if you are focusing on question-driven summarization. This is done simply by first creating the BioASQ data with the --add-q option.  
-
-Then, to train, you will need to run two jobs: One to train, and the other to evaluate the checkpoints simultaneously. Run these commands independently, on two different GPU nodes:
-```
-bash train_medsumm.sh
-bash eval_medsumm.sh
-```
-If you have access to a computing cluster that uses slurm, you may find it useful to use sbatch to submit these jobs.   
-You will have to monitor the training of the Pointer-Generator via tensorboard and manually end the job once the loss has satisfactorily converged. The checkpoint that best performs on the MedInfo validation set will be saved to variable-name-of-experiment-directory/eval/checkpoint_best
-
-Once it is properly trained (the MEDIQA-AnS paper reports results after 10,000 training steps), run inference on full text with the web pages with
-```
-run_chiqa.sh
-```
-The question driven option can be changed in the bash script. Note that the single pass decoding in the original Pointer-Generator code is quite slow, and it will unfortunately take approximately 45 minutes per dataset to perform inference.
-Other experiments can be run configuring the script to generate summaries for the passages or multi-document datasets as well.
-
 
 #### BART
 Install the fairseq library and download BART into the bart directory in this repository. 
@@ -96,6 +81,8 @@ tar -xzvf bart.large.tar.gz
 ```
 Then prepare an environment for BART. This also requires a few NVIDIA packages for optimized training:
 ```
+conda create -n pytorch_env python=3.7
+conda activate pytorch_env
 conda install -n qdriven_env pytorch torchvision cudatoolkit=10.1 -c pytorch
 conda install -n qdriven_env -c anaconda nccl
 git clone https://github.com/NVIDIA/apex
@@ -122,10 +109,12 @@ bash run_chiqa.sh
 ```
 For convenience, we have also included a finetuned BART model available at X. Once you have downloaded this and placed it in the models/bart/<checkpoint-for-experient> directory, you can run inference.
 
+
 #### BiLSTM
 You will first need to set up a tensorflow2-gpu environent.
 ```
 conda create -n tf2_env tensorflow-gpu=2.0 python=3.7
+conda activate tf2_env
 pip install -r requirments.txt
 python -m spacy download en_core_web_sm
 ```
@@ -142,14 +131,41 @@ run_chiqa.sh
 ```
 You are now able to evaluate the BiLSTM output with the evaluation script. During inference, the run_classifier.py script will also create output files that can be used as input for inference with the Pointer-Generator or BART.k can be changed in the run_chiqa.sh script to experiment with passing top k sentences to the generative models. 
 
-### Runnning baselines
+
+#### Pointer-Generator
+First create a new environment:
 ```
-python baselines.py --dataset=chiqa
+conda create -n tf1_env python=3.7
+conda activate tf1_env
+pip install -r requirements.txt
 ```
-This will run the baseline summarization methods on the two summmarization tasks reported in the paper, as well as on the shorter passages. k (number of sentences selected by the baselines) can be changed in the script.
+To train the model, you will have to install cuDNN X and CUDA X. Once these are configured on your machine, you are ready for training.
+The Python 3 version of the Pointer-Generator code from https://github.com/becxer/pointer-generator/ (forked from https://github.com/abisee/pointer-generator) is provided in the models/pointer_generator directory here. The code has been customized to support answer summarization data processing steps, involving changes to data.py, batcher.py, decode.py, and run_summarization.py. However, the model (in model.py) remains the same.
+
+To use the Pointer-Generator, from the pointer_generator directory you will have to run 
+```
+python make_asumm_pg_vocab.py --vocab_path=bioasq_abs2summ_vocab --data_file=../../data_processing/data/bioasq_abs2summ_training_data_without_question.json
+```
+first, to prepare the BioASQ vocab. This is an important step, and make sure that you create the vocab WITH the [QUESTION?] tag if you are focusing on question-driven summarization. This is done simply by first creating the BioASQ data with the --add-q option.  
+
+Then, to train, you will need to run two jobs: One to train, and the other to evaluate the checkpoints simultaneously. Run these commands independently, on two different GPU nodes:
+```
+bash train_medsumm.sh
+bash eval_medsumm.sh
+```
+If you have access to a computing cluster that uses slurm, you may find it useful to use sbatch to submit these jobs.   
+You will have to monitor the training of the Pointer-Generator via tensorboard and manually end the job once the loss has satisfactorily converged. The checkpoint that best performs on the MedInfo validation set will be saved to variable-name-of-experiment-directory/eval/checkpoint_best
+
+Once it is properly trained (the MEDIQA-AnS paper reports results after 10,000 training steps), run inference on full text with the web pages with
+```
+run_chiqa.sh
+```
+The question driven option can be changed in the bash script. Note that the single pass decoding in the original Pointer-Generator code is quite slow, and it will unfortunately take approximately 45 minutes per dataset to perform inference.
+Other experiments can be run configuring the script to generate summaries for the passages or multi-document datasets as well.
+
 
 ### Evaluation
-Once the models are training and the baselines have been run on the summarization datasets you are interested in evaluating, navigate to the evluation directory. To run the evaluation script on the summarization models' predictions, you have a few options:
+Once the models are training and the baselines have been run on the summarization datasets you are interested in evaluating, activate the qdriven_env environment and navigate to the evluation directory. To run the evaluation script on the summarization models' predictions, you have a few options:
 For comparing all models on extractive and abstractive summaries of web pages:
 ```
 python summarization_evaluation.py --dataset=chiqa --bleu --evaluate-models
