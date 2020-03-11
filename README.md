@@ -7,16 +7,7 @@ Create a new environment and install the dependencies for the project.:
 conda create -n qdriven_env python=3.7
 conda activate qdriven_env
 pip install -r requirements.txt
-Prepare environment for BART. This requires a few NVIDIA packages for optimized training:
 ```
-conda install -n qdriven_env pytorch torchvision cudatoolkit=10.1 -c pytorch
-conda install -n qdriven_env -c anaconda nccl
-git clone https://github.com/NVIDIA/apex
-cd apex
-pip install -v --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext"  --global-option="--deprecated_fused_adam" ./
-pip install fairseq
-```
-These instructions are provided in the main fairseq readme (https://github.com/pytorch/fairseq) but we have provided them here in condensed form. Note that to install apex, first make sure your GCC compiler is up-to-date.   
 The spacy tokenizer model will be handy later on as well
 ```
 python -m spacy download en_core_web_sm
@@ -27,6 +18,7 @@ python
 >>> import nltk
 >>> nltk.download('punkt')
 ```
+There are more details on the environments required to train each model in the deep learning section.
 
 ## Data Processing
 Download MEDIQA-AnS from https://doi.org/10.17605/OSF.IO/FYG46 to the evaluation/data directory in this repository.
@@ -101,8 +93,18 @@ Install the fairseq library and download BART into the bart directory in this re
 ```
 wget https://dl.fbaipublicfiles.com/fairseq/models/bart.large.tar.gz
 tar -xzvf bart.large.tar.gz
+```
+Then prepare an environment for BART. This also requires a few NVIDIA packages for optimized training:
+```
+conda install -n qdriven_env pytorch torchvision cudatoolkit=10.1 -c pytorch
+conda install -n qdriven_env -c anaconda nccl
+git clone https://github.com/NVIDIA/apex
+cd apex
+pip install -v --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext"  --global-option="--deprecated_fused_adam" ./
 pip install fairseq
 ```
+These instructions are provided in the main fairseq readme (https://github.com/pytorch/fairseq) but we have provided them here in condensed form. Note that to install apex, first make sure your GCC compiler is up-to-date.   
+
 Once you have fairseq installed and BART downloaded to the bart directory, there are a few steps you have to take to get the bioasq in suitable format for finetuning BART.
 First, run
 ```
@@ -160,5 +162,6 @@ The same question-driven test can be applied to the Pointer-Generator as well, i
 
 Other options, such as saving scores per summary to file, or calculating Wilcoxon p-values, are described in the script.
 
-
-If you are interested in generating the statistics describing the collection, run ```collection_statistics.py --tokenize``` in the evaluation directory. This will generate the statistics reported in the paper with more technical detail.
+If you are interested in generating the statistics describing the collection, run 
+```collection_statistics.py --tokenize``` 
+in the evaluation directory. This will generate the statistics reported in the paper with more technical detail.
