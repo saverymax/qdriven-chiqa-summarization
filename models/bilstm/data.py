@@ -23,7 +23,7 @@ class Vocab():
         Train the subword tokenizer
         """
         encoder = tfds.features.text.SubwordTextEncoder.build_from_corpus(
-           (sentence for abstract in training_data[1] for sentence in abstract), target_vocab_size=vocab_size)
+           (sentence for abstract in training_data for sentence in abstract), target_vocab_size=vocab_size)
         encoder.save_to_file(tokenizer_filename)
 
     def _load_tokenizer(self, tokenizer_filename):

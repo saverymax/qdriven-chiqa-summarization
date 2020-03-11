@@ -1,0 +1,4 @@
+spacy
+numpy
+tensorflow-datasets
+sklearn

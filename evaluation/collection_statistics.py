@@ -157,14 +157,14 @@ def get_stats():
     Main function for getting CHiQA collection stats
     """
     datasets = [
-        ("data/page2answer_single_abstractive_summ.json", "p2a-single-abs"),
-        ("data/page2answer_single_extractive_summ.json", "p2a-single-ext"),
-        ("data/section2answer_multi_abstractive_summ.json", "s2a-multi-abs"),
-        ("data/page2answer_multi_extractive_summ.json", "p2a-multi-ext"),
-        ("data/section2answer_single_abstractive_summ.json", "s2a-single-abs"),
-        ("data/section2answer_single_extractive_summ.json", "s2a-single-ext"),
-        ("data/section2answer_multi_extractive_summ.json", "s2a-multi-ext"),
-        ("data/question_driven_answer_summarization.json", "complete_dataset"),
+        ("../data_processing/data/page2answer_single_abstractive_summ.json", "p2a-single-abs"),
+        ("../data_processing/data/page2answer_single_extractive_summ.json", "p2a-single-ext"),
+        ("../data_processing/data/section2answer_multi_abstractive_summ.json", "s2a-multi-abs"),
+        ("../data_processing/data/page2answer_multi_extractive_summ.json", "p2a-multi-ext"),
+        ("../data_processing/data/section2answer_single_abstractive_summ.json", "s2a-single-abs"),
+        ("../data_processing/data/section2answer_single_extractive_summ.json", "s2a-single-ext"),
+        ("../data_processing/data/section2answer_multi_extractive_summ.json", "s2a-multi-ext"),
+        ("../data_processing/data/question_driven_answer_summarization.json", "complete_dataset"),
         ]
 
     stats = SummarizationDataStats()

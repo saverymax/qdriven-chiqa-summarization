@@ -178,17 +178,18 @@ def evaluate():
     """
     if args.evaluate_all_models:
         # Wilcoxon for BART v PG
+        question_string = "without_question"
         if args.calculate_wilcoxon:
             rouge_dict = {}
         for summ_task in ['page2answer', 'section2answer']:
-            for summ_type in ['singleAbstractive', 'singleExtractive']:
+            for summ_type in ['single_abstractive', 'single_extractive']:
                 print("evaluating: {l}, {t}".format(l=summ_task, t=summ_type))
                 if summ_task == "page2answer":
                     baseline_summ_task = "p2a"
                 else:
                     baseline_summ_task = "s2a"
                 # Currently just doing Lead-3 baseline.
-                if summ_type == "singleAbstractive":
+                if summ_type == "single_abstractive":
                     baseline_summ_type = "single-abs"
                     k = 3
                 else:
@@ -196,12 +197,12 @@ def evaluate():
                     k = 3
                 # Compare models. Use question-driven models here
                 datasets = {
-                    '{k}-random sentences'.format(k=k): "data/baselines/baseline_random_sentences_k_{k}_chiqa_{l}-{t}.json".format(l=baseline_summ_task, t=baseline_summ_type, k=k),
-                    '{k}-first sentences'.format(k=k): "data/baselines/baseline_first_sentences_k_{k}_chiqa_{l}-{t}.json".format(l=baseline_summ_task, t=baseline_summ_type, k=k),
-                    '{k}-best ROUGE'.format(k=k): "data/baselines/baseline_best_rouge_k_{k}_chiqa_{l}-{t}.json".format(l=baseline_summ_task, t=baseline_summ_type, k=k),
+                    '{k}-random sentences'.format(k=k): "data/baselines/chiqa_eval/baseline_random_sentences_k_{k}_chiqa_{l}-{t}.json".format(l=baseline_summ_task, t=baseline_summ_type, k=k),
+                    '{k}-first sentences'.format(k=k): "data/baselines/chiqa_eval/baseline_first_sentences_k_{k}_chiqa_{l}-{t}.json".format(l=baseline_summ_task, t=baseline_summ_type, k=k),
+                    '{k}-best ROUGE'.format(k=k): "data/baselines/chiqa_eval/baseline_best_rouge_k_{k}_chiqa_{l}-{t}.json".format(l=baseline_summ_task, t=baseline_summ_type, k=k),
                     'SC-{k}'.format(k=k): "data/sentence_classifier/chiqa_eval/sent_class_chiqa_{l}_{t}_dropout_5_sent_200_tok_50_val_20_d_256_l2_reg_binary_topk{k}.json".format(l=summ_task, t=summ_type, k=k),
-                    'BART': "data/bart/chiqa_eval/bart_chiqa_with_question_{l}_{t}.json".format(l=summ_task, t=summ_type),
-                    'Pointer Generator': "data/pointer_generator/chiqa_eval/pointergen_chiqa_bioasq_abs2summ_with_question_{l}_{t}.json".format(l=summ_task, t=summ_type),
+                    'BART': "data/bart/chiqa_eval/bart_chiqa_{q}_{l}_{t}.json".format(q=question_string, l=summ_task, t=summ_type),
+                    'Pointer Generator': "data/pointer_generator/chiqa_eval/pointergen_chiqa_bioasq_abs2summ_{q}_{l}_{t}.json".format(q=question_string, l=summ_task, t=summ_type),
                 }
 
                 processor = DataProcessor()
@@ -220,7 +221,7 @@ def evaluate():
                 for eval_set in data:
                     questions = data[eval_set][2]
                     # Save rouge2 per sample to excel
-                    if summ_type == "singleExtractive" and summ_task == "page2answer" and args.rouge_per_sample:
+                    if summ_type == "single_extractive" and summ_task == "page2answer" and args.rouge_per_sample:
                         rouge_scores = []
                         tokenized_gold = tokenize(data[eval_set][0])
                         tokenized_guess = tokenize(data[eval_set][1])
@@ -230,7 +231,7 @@ def evaluate():
                         df = pd.DataFrame(ann_dict)
                         df.to_excel("results/{e}_{l}_{t}_rouge2-per-summ.xlsx".format(e=eval_set, l=summ_task, t=summ_type), index=False)
 
-                    if summ_type == "singleExtractive" and summ_task == "page2answer" and args.bleu_per_sample:
+                    if summ_type == "single_extractive" and summ_task == "page2answer" and args.bleu_per_sample:
                         bleu_scores = []
                         for gs, gld, question in zip(data[eval_set][1], data[eval_set][0], questions):
                             bleu_scores.append(nltk.translate.bleu_score.corpus_bleu([[gld]], [gs]))
@@ -292,7 +293,7 @@ def evaluate():
             rouge_1_list = []
             rouge_2_list = []
             bleu_list = []
-            for summ_type in ['singleAbstractive', 'singleExtractive']:
+            for summ_type in ['single_abstractive', 'single_extractive']:
                 for q in ["with_question", "without_question"]:
                     print("evaluating: {q}, {l}, {t}".format(q=q, l=summ_task, t=summ_type))
                     datasets = {
@@ -307,7 +308,7 @@ def evaluate():
                     for eval_set in data:
                         questions = data[eval_set][2]
                         # Save rouge2 per sample to excel for a task/model/summ type
-                        if summ_type == "singleAbstractive" and summ_task == "page2answer" and "BART" in eval_set:
+                        if summ_type == "single_abstractive" and summ_task == "page2answer" and "BART" in eval_set:
                             if args.rouge_per_sample:
                                 rouge_scores = []
                                 tokenized_gold = tokenize(data[eval_set][0])

@@ -7,7 +7,7 @@ MAX_TOKENS=1024
 UPDATE_FREQ=16
 BART_PATH=bart/bart.large/model.pt
 checkpoint_path=checkpoints_bioasq_$1
-asumm_data=../../data_processing/data/bart/${1}/bart-bin
+asumm_data=bart_config/${1}/bart-bin
 
 CUDA_VISIBLE_DEVICES=0 python train.py ${asumm_data} \
     --restore-file $BART_PATH \
@@ -34,4 +34,3 @@ CUDA_VISIBLE_DEVICES=0 python train.py ${asumm_data} \
     --save-dir=${checkpoint_path} \
     --keep-last-epochs=2 \
     --find-unused-parameters;
-    #--max-tokens-valid $MAX_TOKENS \

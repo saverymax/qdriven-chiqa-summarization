@@ -2,12 +2,21 @@
 This repository contains the code to process the data and run the answer summarization systems presented in the paper Question-Driven Summarization of Answers to Consumer Health Questions
 
 ## Environment
-Create a new environment and install the dependencies for the project:
+Create a new environment and install the dependencies for the project.:
 ```
 conda create -n qdriven_env python=3.7
 conda activate qdriven_env
 pip install -r requirements.txt
+Prepare environment for BART. This requires a few NVIDIA packages for optimized training:
 ```
+conda install -n qdriven_env pytorch torchvision cudatoolkit=10.1 -c pytorch
+conda install -n qdriven_env -c anaconda nccl
+git clone https://github.com/NVIDIA/apex
+cd apex
+pip install -v --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext"  --global-option="--deprecated_fused_adam" ./
+pip install fairseq
+```
+These instructions are provided in the main fairseq readme (https://github.com/pytorch/fairseq) but we have provided them here in condensed form. Note that to install apex, first make sure your GCC compiler is up-to-date.   
 The spacy tokenizer model will be handy later on as well
 ```
 python -m spacy download en_core_web_sm
@@ -111,9 +120,15 @@ bash run_chiqa.sh
 ```
 For convenience, we have also included a finetuned BART model available at X. Once you have downloaded this and placed it in the models/bart/<checkpoint-for-experient> directory, you can run inference.
 
-
 #### BiLSTM
-This is quite a bit easier to train than the previous two models. Just run
+You will first need to set up a tensorflow2-gpu environent.
+```
+conda create -n tf2_env tensorflow-gpu=2.0 python=3.7
+pip install -r requirments.txt
+python -m spacy download en_core_web_sm
+```
+Use the requirements.txt file located in the models/bilstm directory.   
+Once the environment is set up, you are ready for training. This is quite a bit easier than the previous two models.
 ```
 train_sentence_classifier.sh
 ```
@@ -123,14 +138,13 @@ Once the BiLSTM is trained, the following script is provided to run the model on
 ```
 run_chiqa.sh
 ```
-You are now able to evaluate the BiLSTM output with the evaluation script.
+You are now able to evaluate the BiLSTM output with the evaluation script. During inference, the run_classifier.py script will also create output files that can be used as input for inference with the Pointer-Generator or BART.k can be changed in the run_chiqa.sh script to experiment with passing top k sentences to the generative models. 
 
 ### Runnning baselines
-To run the baseline systems, all you have to do is
 ```
 python baselines.py --dataset=chiqa
 ```
-This will run the baseline summarization methods on the two summmarization tasks reported in the paper, as well as on the shorter passages.
+This will run the baseline summarization methods on the two summmarization tasks reported in the paper, as well as on the shorter passages. k (number of sentences selected by the baselines) can be changed in the script.
 
 ### Evaluation
 Once the models are training and the baselines have been run on the summarization datasets you are interested in evaluating, navigate to the evluation directory. To run the evaluation script on the summarization models' predictions, you have a few options:
@@ -147,4 +161,4 @@ The same question-driven test can be applied to the Pointer-Generator as well, i
 Other options, such as saving scores per summary to file, or calculating Wilcoxon p-values, are described in the script.
 
 
-If you are interested in generating the statistics describing the collection, run the ```collection_statistics.py``` script in the evaluation directory. This will generate the statistics reported in the paper with more technical detail.
+If you are interested in generating the statistics describing the collection, run ```collection_statistics.py --tokenize``` in the evaluation directory. This will generate the statistics reported in the paper with more technical detail.

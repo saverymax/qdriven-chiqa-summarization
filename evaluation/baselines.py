@@ -152,7 +152,7 @@ def save_baseline(baseline, filename):
     """
     Save baseline in format for rouge evaluation
     """
-    with open("data/baselines/baseline_{}.json".format(filename), "w", encoding="utf-8") as f:
+    with open("data/baselines/chiqa_eval/baseline_{}.json".format(filename), "w", encoding="utf-8") as f:
         json.dump(baseline, f, indent=4)
 
 
@@ -162,10 +162,10 @@ def run_baselines():
     """
     # Load the MEDIQA-AnS datasets
     datasets = [
-        ("data/page2answer_single_abstractive_summ.json", "p2a-single-abs"),
-        ("data/page2answer_single_extractive_summ.json", "p2a-single-ext"),
-        ("data/section2answer_single_abstractive_summ.json", "s2a-single-abs"),
-        ("data/section2answer_single_extractive_summ.json", "s2a-single-ext"),
+        ("../data_processing/data/page2answer_single_abstractive_summ.json", "p2a-single-abs"),
+        ("../data_processing/data/page2answer_single_extractive_summ.json", "p2a-single-ext"),
+        ("../data_processing/data/section2answer_single_abstractive_summ.json", "s2a-single-abs"),
+        ("../data_processing/data/section2answer_single_extractive_summ.json", "s2a-single-ext"),
     ]
 
     for data in datasets:

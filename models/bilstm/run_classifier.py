@@ -24,11 +24,9 @@ FLAGS = flags.FLAGS
 
 # Paths
 flags.DEFINE_string('data_path', '', 'Path expression to tf.Example datafiles. Can include wildcards to access multiple datafiles.')
-flags.DEFINE_string('vocab_path', '', 'Path expression to text vocabulary file.')
 flags.DEFINE_string('mode', 'train', 'Select train/infer')
 flags.DEFINE_string('exp_name', '', 'Name for experiment. Tensorboard logs and models will be saved in a directories under this one')
 flags.DEFINE_string('tensorboard_log', '', 'Name of specific run for tb to log to. The experiment name will be the parent directory')
-flags.DEFINE_string('model_image_path', '', "Path to save image of model graph")
 flags.DEFINE_string('model_path', '', "Path to save model checkpoint")
 flags.DEFINE_string('dataset', '', "The dataset used for inference, used to specify how to load the data, e.g., medinfo")
 flags.DEFINE_string('summary_type', '', "The summary task within the chiqa dataset. The multi and single document tasks require different data handling")
@@ -84,15 +82,11 @@ def run_inference(model, data, threshold, top_k_sent, binary_model):
     """
     predictions = model.predict({'q_input': data[0], 'abs_input': data[1]})
     logging.info("Predictions shape: {}".format(predictions.shape))
-    #print(predictions)
     if binary_model:
         # Select preds for just label 1
         reduced_preds = predictions[:, :, 1]
         reduced_preds = tf.squeeze(reduced_preds)
         filtered_predictions = tf.math.top_k(reduced_preds, k=top_k_sent, sorted=True)
-        # Using threshold
-        # filtered_predictions = np.argwhere(predictions > threshold)
-        #print(filtered_predictions)
     else:
         reduced_preds = tf.squeeze(predictions)
         filtered_predictions = tf.math.top_k(reduced_preds, k=top_k_sent)
@@ -149,25 +143,22 @@ def main(argv):
     """
     logging.info("Num GPUs Available: {}\n".format(len(tf.config.experimental.list_physical_devices('GPU'))))
     logging.basicConfig(filename="{}/medsumm.log".format(FLAGS.exp_name), filemode='w', level=logging.DEBUG)
-    logging.info("TODO: Add masking to padded sentences, which will probably mask whole inputs. So figure out how to do that without getting error. This is addressed here: https://github.com/tensorflow/tensorflow/issues/33069")
     logging.info("Initiating sentence classication model...\n")
     logging.info("Loading data:")
     data_loader = DataLoader(FLAGS.data_path, FLAGS.max_tok_q, FLAGS.max_sentences, FLAGS.max_tok_sent, FLAGS.dataset, FLAGS.summary_type)
     # Returns tuple
     data = data_loader.load_data(FLAGS.mode, FLAGS.tag_sentences)
-    logging.info("Questions: {}".format(data[0][0:2]))
-    logging.info("Sentences: {}".format(data[1][0][:2]))
     if FLAGS.mode == "train":
         x_train, y_train, x_val, y_val = data_loader.split_data(data)
-        logging.info("Questions")
+        logging.info("Questions:")
         logging.info(x_train[0][:2])
-        logging.info("Sentences")
+        logging.info("Sentences:")
         logging.info(x_train[1][:2])
 
     vocab_processor = Vocab()
     if FLAGS.train_tokenizer:
         logging.info("Training tokenizer\n")
-        vocab_processor.train_tokenizer(FLAGS.tokenizer_path, x_train, FLAGS.vocab_size)
+        vocab_processor.train_tokenizer(FLAGS.tokenizer_path, data[1], FLAGS.vocab_size)
     # Once trained, get the subword tokenizer and encode the data
     logging.info("Encoding text")
     if FLAGS.mode == "train":
@@ -202,8 +193,7 @@ def main(argv):
 
         model = SentenceClassificationModel(
             FLAGS.vocab_size, FLAGS.batch_size, FLAGS.hidden_dim, FLAGS.dropout,
-            FLAGS.max_tok_q, FLAGS.max_sentences, FLAGS.max_tok_sent,
-            FLAGS.model_image_path
+            FLAGS.max_tok_q, FLAGS.max_sentences, FLAGS.max_tok_sent
             )
 
         if FLAGS.binary_model:
@@ -214,8 +204,6 @@ def main(argv):
             run_training(model, x_train, y_train, x_val, y_val)
 
     if FLAGS.mode == "infer":
-        logging.info("TOD: handle all chiqa dataset data processing cases")
-        logging.info("Currently padding for inference. Is this necessary?")
         encoded_data = vocab_processor.encode_data(FLAGS.tokenizer_path, data)
         padded_data = []
         padded_data.append(data_loader.pad_data(encoded_data[0], "question"))

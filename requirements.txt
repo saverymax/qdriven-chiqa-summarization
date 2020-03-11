@@ -1,6 +1,8 @@
 lxml
 numpy
 spacy
+pandas
 sklearn
 py-rouge
 nltk
+tqdm
