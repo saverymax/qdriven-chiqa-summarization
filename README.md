@@ -2,8 +2,8 @@
 This repository contains the code to process the data and run the answer summarization systems presented in the paper Question-Driven Summarization of Answers to Consumer Health Questions
 If you are interested in just downloading the data, please refer to https://doi.org/10.17605/OSF.IO/FYG46. However, if you are interested in repeating the experiments reported in the paper, clone this repository and move the data found at https://doi.org/10.17605/OSF.IO/FYG46 to the evaluation/data directory.
 
-## Environment
-To train the models and run the experiments, you will need to set up a few environments: one for data processing and evaluation; the BiLSTM; BART; and the Pointer-Generator. Since we are going to be processing the data first, create the following environment to install the data processing and evaluation dependencies
+## Environments
+To train the models and run the experiments, you will need to set up a few environments: data processing and evaluation; the BiLSTM; BART; and the Pointer-Generator. Since we are going to be processing the data first, create the following environment to install the data processing and evaluation dependencies
 ```
 conda create -n qdriven_env python=3.7
 conda activate qdriven_env
@@ -105,9 +105,10 @@ If you have been testing question-driven summarization, include with_question in
 
 Once you have finetuned the model, run inference on the MEDIQA-AnS dataset with
 ```
-bash run_chiqa.sh
+bash run_chiqa.sh without_question
 ```
-For convenience, we have also included a finetuned BART model available at X. Once you have downloaded this and placed it in the models/bart/<checkpoint-for-experient> directory, you can run inference.
+Or use with_question if you have trained the appropriate model.   
+For convenience, we have also included a finetuned BART model available at X. Once you have downloaded this and placed it in the models/bart/<checkpoint-for-experient> directory, you can use it to run inference.
 
 
 #### BiLSTM
@@ -133,12 +134,15 @@ You are now able to evaluate the BiLSTM output with the evaluation script. Durin
 
 
 #### Pointer-Generator
-First create a new environment:
+Navigate to the models/pointer_generator directory and create a new environment:
 ```
-conda create -n tf1_env python=3.7
+conda create -n tf1_env python=3.6
 conda activate tf1_env
+wget https://files.pythonhosted.org/packages/cb/4d/c9c4da41c6d7b9a4949cb9e53c7032d7d9b7da0410f1226f7455209dd962/tensorflow_gpu-1.2.0-cp36-cp36m-manylinux1_x86_64.whl
+pip install tensorflow_gpu-1.2.0-cp36-cp36m-manylinux1_x86_64.whl 
 pip install -r requirements.txt
 ```
+The tensorflow 1.2.0 version is only availble via download from the pypi.org.   
 To train the model, you will have to install cuDNN X and CUDA X. Once these are configured on your machine, you are ready for training.
 The Python 3 version of the Pointer-Generator code from https://github.com/becxer/pointer-generator/ (forked from https://github.com/abisee/pointer-generator) is provided in the models/pointer_generator directory here. The code has been customized to support answer summarization data processing steps, involving changes to data.py, batcher.py, decode.py, and run_summarization.py. However, the model (in model.py) remains the same.
 
