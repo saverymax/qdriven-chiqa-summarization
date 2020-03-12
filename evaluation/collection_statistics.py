@@ -164,7 +164,7 @@ def get_stats():
         ("../data_processing/data/section2answer_single_abstractive_summ.json", "s2a-single-abs"),
         ("../data_processing/data/section2answer_single_extractive_summ.json", "s2a-single-ext"),
         ("../data_processing/data/section2answer_multi_extractive_summ.json", "s2a-multi-ext"),
-        ("../data_processing/data/question_driven_answer_summarization.json", "complete_dataset"),
+        ("../data_processing/data/question_driven_answer_summarization_primary_dataset.json", "complete_dataset"),
         ]
 
     stats = SummarizationDataStats()

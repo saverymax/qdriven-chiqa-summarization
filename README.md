@@ -3,7 +3,7 @@ This repository contains the code to process the data and run the answer summari
 If you are interested in just downloading the data, please refer to https://doi.org/10.17605/OSF.IO/FYG46. However, if you are interested in repeating the experiments reported in the paper, clone this repository and move the data found at https://doi.org/10.17605/OSF.IO/FYG46 to the evaluation/data directory.
 
 ## Environments
-To train the models and run the experiments, you will need to set up a few environments: data processing and evaluation; the BiLSTM; BART; and the Pointer-Generator. Since we are going to be processing the data first, create the following environment to install the data processing and evaluation dependencies
+To train the models and run the experiments, you will need to set up a few environments with ananconda: data processing and evaluation; the BiLSTM; BART; and the Pointer-Generator. Since we are going to be processing the data first, create the following environment to install the data processing and evaluation dependencies:
 ```
 conda create -n qdriven_env python=3.7
 conda activate qdriven_env
@@ -20,7 +20,7 @@ python
 >>> import nltk
 >>> nltk.download('punkt')
 ```
-There are more details on the environments required to train each model in the following sections.
+There are more details regarding the environments required to train each model in the following sections.
 
 
 ## Answer Summarization
@@ -37,7 +37,7 @@ Baselines:
 
 
 ### Runnning baselines
-Running the baselines is simple and can done while the qdriven_env is active.
+Running the baselines is simple and can be done while the qdriven_env is active.
 ```
 python baselines.py --dataset=chiqa
 ```
@@ -45,13 +45,13 @@ This will run the baseline summarization methods on the two summmarization tasks
 
 
 ### Running deep learning
-This code is set up to train and run inference with all models first, and then use the summarization_evaluation.py script to evaluate all results at once. This section describes the steps for training and inference.
+The following code is organized to train and run inference with all models first, and then use the summarization_evaluation.py script to evaluate all results at once. This section describes the steps for training and inference.
 
 
 #### Training Preprocessing
-The models first have to be trained before they can be used for summarization. This requires gaining access to the BioASQ data. To do this, you have to register for an account at http://bioasq.org/participate.
+The BioASQ data for training first has to be acquired. To do so, you have to register for an account at http://bioasq.org/participate.
 
-Once the bioasq data is downloaded, it should be placed in the data_processing/data directory in the cloned github repository, so that the path looks like data_processing/data/BioASQ-training7b/BioASQ-training7b/training7b.json. Note that the version of BioASQ may be changed at the time of downloaded and this will have to be fixed in the code.
+Once the bioasq data has been downloaded, it should be placed in the data_processing/data directory in the cloned github repository, so that the path relative to the data_processing directory looks like data_processing/data/BioASQ-training7b/BioASQ-training7b/training7b.json. Note that the version of BioASQ may be changed at the time of downloaded and this will have to be fixed in the code. 
 
 Once the data is in the correct place, run the following scripts:
 ```
@@ -60,12 +60,7 @@ python prepare_training_data.py -bt --bart-bioasq --bioasq-sent
 ```
 This will prepare separate training sets for the three deep learning models. Include the ```--add-q``` option to create additional datasets with the question concatenated to the beginning of the documents, for question-driven summarization. This step will take a while to finish.
 
-Note: Not sure if I am going to include this processing step.
-Just make sure to give credence to medinfo
 Then, prepare the MedInfo validation data for the Pointer-Generator and BART.
-First download the .xlsx MedInfo file at https://github.com/abachaa/Medication_QA_MedInfo2019
-
-To prepare the MedInfo validation data for the Pointer-Generator and BART. The BiLSTM does not need the MedInfo data:
 ```
 python prepare_validation_data.py --pg --bart
 ```
@@ -74,12 +69,12 @@ Now you are ready for training and inference.
 
 
 #### BART
-Install the fairseq library and download BART into the bart directory in this repository. 
+Download BART into the models/bart directory in this repository. 
 ```
 wget https://dl.fbaipublicfiles.com/fairseq/models/bart.large.tar.gz
 tar -xzvf bart.large.tar.gz
 ```
-Then prepare an environment for BART. This also requires a few NVIDIA packages for optimized training:
+Then prepare an environment for BART. This also requires a few NVIDIA packages for optimized training.
 ```
 conda create -n pytorch_env python=3.7
 conda activate pytorch_env
@@ -88,12 +83,16 @@ conda install -n qdriven_env -c anaconda nccl
 git clone https://github.com/NVIDIA/apex
 cd apex
 pip install -v --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext"  --global-option="--deprecated_fused_adam" ./
-pip install fairseq
 ```
 These instructions are provided in the main fairseq readme (https://github.com/pytorch/fairseq) but we have provided them here in condensed form. Note that to install apex, first make sure your GCC compiler is up-to-date.   
-
+Once these dependencies have been installed, you are ready to install fairseq. This requires installing an editable version of the repository. Navigate to back to the models/bart directory of this repo and run:
+```
+git clone https://github.com/pytorch/fairseq
+cd fairseq
+pip install --editable .
+```
 Once you have fairseq installed and BART downloaded to the bart directory, there are a few steps you have to take to get the bioasq in suitable format for finetuning BART.
-First, run
+First
 ```
 bash process_bioasq_data.sh -b -f
 ```
@@ -108,7 +107,7 @@ Once you have finetuned the model, run inference on the MEDIQA-AnS dataset with
 bash run_chiqa.sh without_question
 ```
 Or use with_question if you have trained the appropriate model.   
-For convenience, we have also included a finetuned BART model available at X. Once you have downloaded this and placed it in the models/bart/<checkpoint-for-experient> directory, you can use it to run inference.
+For convenience, we have also included a finetuned BART model available at X. Once you have downloaded this and placed it in the models/bart/<checkpoint-for-experiment> directory, you can use it to run inference.
 
 
 #### BiLSTM
@@ -143,17 +142,16 @@ pip install tensorflow_gpu-1.2.0-cp36-cp36m-manylinux1_x86_64.whl
 pip install -r requirements.txt
 python -m spacy download en_core_web_sm
 ```
-The tensorflow 1.2.0 version is only availble via download from the pypi.org.   
-To train the model, you will have to install cuDNN X and CUDA X. Once these are configured on your machine, you are ready for training.
+The tensorflow 1.2.0 version is only availble via download from pypi.org, hence the use of ```wget``` first. To train the model, you will have to install cuDNN X and CUDA X. Once these are configured on your machine, you are ready for training.   
 The Python 3 version of the Pointer-Generator code from https://github.com/becxer/pointer-generator/ (forked from https://github.com/abisee/pointer-generator) is provided in the models/pointer_generator directory here. The code has been customized to support answer summarization data processing steps, involving changes to data.py, batcher.py, decode.py, and run_summarization.py. However, the model (in model.py) remains the same.
 
 To use the Pointer-Generator, from the pointer_generator directory you will have to run 
 ```
 python make_asumm_pg_vocab.py --vocab_path=bioasq_abs2summ_vocab --data_file=../../data_processing/data/bioasq_abs2summ_training_data_without_question.json
 ```
-first, to prepare the BioASQ vocab. This is an important step, and make sure that you create the vocab WITH the [QUESTION?] tag if you are focusing on question-driven summarization. This is done simply by first creating the BioASQ data with the --add-q option.  
+first, to prepare the BioASQ vocab. If you are focusing on question-driven summarization, provide that dataset instead.
 
-Then, to train, you will need to run two jobs: One to train, and the other to evaluate the checkpoints simultaneously. Run these commands independently, on two different GPU nodes:
+Then, to train, you will need to run two jobs: One to train, and the other to evaluate the checkpoints simultaneously. Run these commands independently, on two different GPUs:
 ```
 bash train_medsumm.sha without_question
 bash eval_medsumm.sha without_question
@@ -166,23 +164,28 @@ Once it is properly trained (the MEDIQA-AnS paper reports results after 10,000 t
 run_chiqa.sh
 ```
 The question driven option can be changed in the bash script. Note that the single pass decoding in the original Pointer-Generator code is quite slow, and it will unfortunately take approximately 45 minutes per dataset to perform inference.
-Other experiments can be run configuring the script to generate summaries for the passages or multi-document datasets as well.
+Other experiments can be run if you have configured the bash script to generate summaries for the passages or multi-document datasets as well.
 
 
 ### Evaluation
-Once the models are training and the baselines have been run on the summarization datasets you are interested in evaluating, activate the qdriven_env environment and navigate to the evluation directory. To run the evaluation script on the summarization models' predictions, you have a few options:
+Once the models are training and the baselines have been run on the summarization datasets you are interested in evaluating, activate the qdriven_env environment again and navigate to the evaluation directory. To run the evaluation script on the summarization models' predictions, you have a few options:
 For comparing all models on extractive and abstractive summaries of web pages:
 ```
 python summarization_evaluation.py --dataset=chiqa --bleu --evaluate-models
 ```
-Or to run two versions of BART (question-driven approach and without questions) run
+Or to run two versions of BART (question-driven approach and without questions, if you have trained both) run
 ```
 python summarization_evaluation.py --dataset=chiqa --bleu --q-driven
 ```
 The same question-driven test can be applied to the Pointer-Generator as well, if you have trained the appropriate model with the correctly formatted question-driven dataset.
 
-Other options, such as saving scores per summary to file, or calculating Wilcoxon p-values, are described in the script.
+More details about the options, such as saving scores per summary to file, or calculating Wilcoxon p-values, are described in the script.
 
 If you are interested in generating the statistics describing the collection, run 
 ```collection_statistics.py --tokenize``` 
 in the evaluation directory. This will generate the statistics reported in the paper with more technical detail.
+
+
+That's it! Thank you for using this code, and please contact us if you find any issues with the repository or have questions about summarization. If you publish work related to this project, please cite
+```
+```

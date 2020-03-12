@@ -418,5 +418,5 @@ class Batcher(object):
         tf.logging.warning('Found an example with empty article text. Skipping it.')
       else:
         if i < 2:
-          tf.logging.info("\n\nSummary: {0}\nArticles{1}\n\n".format(abstract_text, article_text))
+          tf.logging.info("\n\nSummary: {0}\nArticle\n{1}\n\n".format(abstract_text, article_text))
         yield (article_text, abstract_text, question)

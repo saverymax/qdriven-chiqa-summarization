@@ -17,6 +17,7 @@ data_processing/data/medinfo_section2answer_validation_data_without_question.jso
 data_processing/data/medinfo_section2answer_validation_data_without_question_s-tags.json
 models/pointer_generator/bioasq_abs2summ*
 models/bart/dict.txt
+models/bart/fairseq
 models/bart/encoder.json
 models/bart/vocab.bpe
 models/bart/checkpoints*
