@@ -9,6 +9,7 @@ BART_PATH=bart/bart.large/model.pt
 checkpoint_path=checkpoints_bioasq_$1
 asumm_data=bart_config/${1}/bart-bin
 
+#CUDA_VISIBLE_DEVICES=0 python train.py ${asumm_data} \
 CUDA_VISIBLE_DEVICES=0 python fairseq/fairseq_cli/train.py ${asumm_data} \
     --restore-file $BART_PATH \
     --max-tokens $MAX_TOKENS \
