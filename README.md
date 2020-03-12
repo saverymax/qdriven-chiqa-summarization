@@ -49,7 +49,13 @@ The following code is organized to train and run inference with all models first
 
 
 #### Training Preprocessing
-The BioASQ data for training first has to be acquired. To do so, you have to register for an account at http://bioasq.org/participate.
+First prepare the validation data for the Pointer-Generator and BART:
+```
+python prepare_validation_data.py --pg --bart
+```
+It is optional to include the --add-q option if you are interested in training models question-driven summarization.   
+
+To create the training data, the BioASQ data for training first has to be acquired. To do so, you have to register for an account at http://bioasq.org/participate.
 
 Once the bioasq data has been downloaded, it should be placed in the data_processing/data directory in the cloned github repository, so that the path relative to the data_processing directory looks like data_processing/data/BioASQ-training7b/BioASQ-training7b/training7b.json. Note that the version of BioASQ may be changed at the time of downloaded and this will have to be fixed in the code. 
 
@@ -58,60 +64,11 @@ Once the data is in the correct place, run the following scripts:
 python process_bioasq_data.py -p
 python prepare_training_data.py -bt --bart-bioasq --bioasq-sent
 ```
-This will prepare separate training sets for the three deep learning models. Include the ```--add-q``` option to create additional datasets with the question concatenated to the beginning of the documents, for question-driven summarization. This step will take a while to finish.
-
-Then, prepare the MedInfo validation data for the Pointer-Generator and BART.
-```
-python prepare_validation_data.py --pg --bart
-```
-Again, it is optional to include the --add-q option.   
-Now you are ready for training and inference.
+This will prepare separate training sets for the three deep learning models. Include the ```--add-q``` option to create additional datasets with the question concatenated to the beginning of the documents, for question-driven summarization. This step will take a while to finish. Once it is done, you are ready for training and inference.
 
 
-#### BART
-Download BART into the models/bart directory in this repository. 
-```
-wget https://dl.fbaipublicfiles.com/fairseq/models/bart.large.tar.gz
-tar -xzvf bart.large.tar.gz
-```
-Then prepare an environment for BART. This also requires a few NVIDIA packages for optimized training.
-```
-conda create -n pytorch_env python=3.7
-conda activate pytorch_env
-conda install -n qdriven_env pytorch torchvision cudatoolkit=10.1 -c pytorch
-conda install -n qdriven_env -c anaconda nccl
-git clone https://github.com/NVIDIA/apex
-cd apex
-pip install -v --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext"  --global-option="--deprecated_fused_adam" ./
-```
-These instructions are provided in the main fairseq readme (https://github.com/pytorch/fairseq) but we have provided them here in condensed form. Note that to install apex, first make sure your GCC compiler is up-to-date.   
-Once these dependencies have been installed, you are ready to install fairseq. This requires installing an editable version of the repository. Navigate to back to the models/bart directory of this repo and run:
-```
-git clone https://github.com/pytorch/fairseq
-cd fairseq
-pip install --editable .
-```
-Once you have fairseq installed and BART downloaded to the bart directory, there are a few steps you have to take to get the bioasq in suitable format for finetuning BART.
-First
-```
-bash process_bioasq_data.sh -b -f
-```
-This will prepare the byte-pair encodings and run the fairseq preprocessing. Once the processing is complete, you can finetune BART with
-```
-bash finetune_bart_bioasq.sh without_question
-```
-If you have been testing question-driven summarization, include with_question instead. The larger your computing cluster, the faster you will be able to train. For the experiments presented in the paper, we trained BART for two days on three V100-SXM2 GPUs with 32GB of memory each. The bash script provided here is currently configured to run with one GPU; however, the fairseq library supports multi-gpu training. 
-
-Once you have finetuned the model, run inference on the MEDIQA-AnS dataset with
-```
-bash run_chiqa.sh without_question
-```
-Or use with_question if you have trained the appropriate model.   
-For convenience, we have also included a finetuned BART model available at X. Once you have downloaded this and placed it in the models/bart/<checkpoint-for-experiment> directory, you can use it to run inference.
-
-
-#### BiLSTM
-You will first need to set up a tensorflow2-gpu environent.
+#### BiLSTM (sentence classification)
+You will first need to set up a tensorflow2-gpu environent and install the dependencies for the model:
 ```
 conda create -n tf2_env tensorflow-gpu=2.0 python=3.7
 conda activate tf2_env
@@ -130,6 +87,58 @@ Once the BiLSTM is trained, the following script is provided to run the model on
 run_chiqa.sh
 ```
 You are now able to evaluate the BiLSTM output with the evaluation script. During inference, the run_classifier.py script will also create output files that can be used as input for inference with the Pointer-Generator or BART.k can be changed in the run_chiqa.sh script to experiment with passing top k sentences to the generative models. 
+
+
+#### BART
+Download BART into the models/bart directory in this repository. 
+```
+wget https://dl.fbaipublicfiles.com/fairseq/models/bart.large.tar.gz
+tar -xzvf bart.large.tar.gz
+```
+Then prepare an environment for BART. This also requires a few NVIDIA packages for optimized training.
+```
+conda create -n pytorch_env python=3.7
+conda activate pytorch_env
+conda install -n pytorch_env pytorch torchvision cudatoolkit=10.1 -c pytorch
+conda install -n pytorch_env -c anaconda nccl
+git clone https://github.com/NVIDIA/apex
+cd apex
+pip install -v --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext"  --global-option="--deprecated_fused_adam" ./
+```
+These instructions are provided in the main fairseq readme (https://github.com/pytorch/fairseq) but we have provided them here in condensed form. Note that to install apex, first make sure your GCC compiler is up-to-date.   
+Once these dependencies have been installed, you are ready to install fairseq. This requires installing an editable version of a earlier commit of the repository. Navigate to back to the models/bart directory of this repo and run:
+```
+git clone https://github.com/pytorch/fairseq
+cd fairseq
+pip install --editable .
+or 
+git clone https://github.com/pytorch/fairseq
+cd fairseq
+git checkout 43cf9c977b8470ec493cc32d248fdcd9a984a9f6
+pip install --editable .
+OR
+wget https://github.com/pytorch/fairseq/archive/v0.9.0.tar.gz
+tar -xvzf fairseq-0.9.0/
+cd fairseq-0.9.0/
+pip install --editable .
+```
+Because the fairseq repository is contains research projects under continuous development, the previous commit checked-out here should can be used to recreate the results. Using a current version of fairseq may require more troubleshooting. Once you have fairseq installed and BART downloaded to the bart directory, there are a few steps you have to take to get the bioasq in suitable format for finetuning BART.
+First
+```
+bash process_bioasq_data.sh -b -f
+```
+This will prepare the byte-pair encodings and run the fairseq preprocessing. Once the processing is complete, you can finetune BART with
+```
+bash finetune_bart_bioasq.sh without_question
+```
+If you have been testing question-driven summarization, include with_question instead. The larger your computing cluster, the faster you will be able to train. For the experiments presented in the paper, we trained BART for two days on three V100-SXM2 GPUs with 32GB of memory each. The bash script provided here is currently configured to run with one GPU; however, the fairseq library supports multi-gpu training. 
+
+Once you have finetuned the model, run inference on the MEDIQA-AnS dataset with
+```
+bash run_chiqa.sh without_question
+```
+Or use with_question if you have trained the appropriate model.   
+For convenience, we have also included a finetuned BART model available at X. Once you have downloaded this and placed it in the models/bart/<checkpoint-for-experiment> directory, you can use it to run inference.
 
 
 #### Pointer-Generator
