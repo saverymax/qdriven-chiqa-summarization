@@ -3,7 +3,7 @@ This repository contains the code to process the data and run the answer summari
 If you are interested in just downloading the data, please refer to https://doi.org/10.17605/OSF.IO/FYG46. However, if you are interested in repeating the experiments reported in the paper, clone this repository and move the data found at https://doi.org/10.17605/OSF.IO/FYG46 to the evaluation/data directory.
 
 ## Environments
-To train the models and run the experiments, you will need to set up a few environments with ananconda: data processing and evaluation; the BiLSTM; BART; and the Pointer-Generator. Since we are going to be processing the data first, create the following environment to install the data processing and evaluation dependencies:
+All instructions provided here have been tested in a Linux operating system. To train the models and run the experiments, you will need to set up a few environments with anaconda: data processing and evaluation; the BiLSTM; BART; and the Pointer-Generator. Since we are going to be processing the data first, create the following environment to install the data processing and evaluation dependencies: 
 ```
 conda create -n qdriven_env python=3.7
 conda activate qdriven_env
