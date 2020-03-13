@@ -37,7 +37,7 @@ Baselines:
 
 
 ### Runnning baselines
-Running the baselines is simple and can be done while the qdriven_env is active.
+Running the baselines is simple and can be done while the qdriven_env environment is active.
 ```
 python baselines.py --dataset=chiqa
 ```
@@ -110,24 +110,15 @@ Once these dependencies have been installed, you are ready to install fairseq. T
 ```
 git clone https://github.com/pytorch/fairseq
 cd fairseq
-pip install --editable .
-or 
-git clone https://github.com/pytorch/fairseq
-cd fairseq
 git checkout 43cf9c977b8470ec493cc32d248fdcd9a984a9f6
-pip install --editable .
-OR
-wget https://github.com/pytorch/fairseq/archive/v0.9.0.tar.gz
-tar -xvzf fairseq-0.9.0/
-cd fairseq-0.9.0/
 pip install --editable .
 ```
 Because the fairseq repository is contains research projects under continuous development, the previous commit checked-out here should can be used to recreate the results. Using a current version of fairseq may require more troubleshooting. Once you have fairseq installed and BART downloaded to the bart directory, there are a few steps you have to take to get the bioasq in suitable format for finetuning BART.
 First
 ```
-bash process_bioasq_data.sh -b -f
+bash process_bioasq_data.sh -b -f without_question
 ```
-This will prepare the byte-pair encodings and run the fairseq preprocessing. Once the processing is complete, you can finetune BART with
+This will prepare the byte-pair encodings and run the fairseq preprocessing. with_question will prepare data for question-driven summarization, without_question for plain summaization. Once the processing is complete, you can finetune BART with
 ```
 bash finetune_bart_bioasq.sh without_question
 ```
@@ -162,8 +153,8 @@ first, to prepare the BioASQ vocab. If you are focusing on question-driven summa
 
 Then, to train, you will need to run two jobs: One to train, and the other to evaluate the checkpoints simultaneously. Run these commands independently, on two different GPUs:
 ```
-bash train_medsumm.sha without_question
-bash eval_medsumm.sha without_question
+bash train_medsumm.sh without_question
+bash eval_medsumm.sh without_question
 ```
 If you have access to a computing cluster that uses slurm, you may find it useful to use sbatch to submit these jobs.   
 You will have to monitor the training of the Pointer-Generator via tensorboard and manually end the job once the loss has satisfactorily converged. The checkpoint that best performs on the MedInfo validation set will be saved to variable-name-of-experiment-directory/eval/checkpoint_best

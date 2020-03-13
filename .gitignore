@@ -13,8 +13,8 @@ data_processing/data/bioasq_abs2summ_training_data_with*
 data_processing/data/bioasq_snippets.json
 models/pointer_generator/bioasq_abs2summ*
 models/bart/dict.txt
-modeks/bart/apex
-models/bart/fairseq
+models/bart/apex
+models/bart/fairseq*
 models/bart/encoder.json
 models/bart/vocab.bpe
 models/bart/checkpoints*
