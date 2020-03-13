@@ -129,7 +129,6 @@ Once you have finetuned the model, run inference on the MEDIQA-AnS dataset with
 bash run_chiqa.sh without_question
 ```
 Or use with_question if you have trained the appropriate model.   
-For convenience, we have also included a finetuned BART model available at X. Once you have downloaded this and placed it in the models/bart/<checkpoint-for-experiment> directory, you can use it to run inference.
 
 
 #### Pointer-Generator
