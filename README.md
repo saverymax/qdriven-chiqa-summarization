@@ -95,9 +95,9 @@ Download BART into the models/bart directory in this repository.
 wget https://dl.fbaipublicfiles.com/fairseq/models/bart.large.tar.gz
 tar -xzvf bart.large.tar.gz
 ```
-Then prepare an environment for BART. This also requires a few NVIDIA packages for optimized training.
+Navigate to the models/bart directory and prepare an environment for BART. This also requires a few NVIDIA packages for optimized training.
 ```
-conda create -n pytorch_env python=3.7
+conda create -n pytorch_env python=3.7 --file requirements.txt
 conda activate pytorch_env
 conda install -n pytorch_env pytorch torchvision cudatoolkit=10.1 -c pytorch
 conda install -n pytorch_env -c anaconda nccl
