@@ -5,9 +5,6 @@ to download the pubmed articles for each snippet run
 python process_bioasq.py -d
 then to process the questions, answers, and snippets, run:
 python process_bioasq.py -p
-or to process all of this but join the snippets that are taken from the same
-abstract but are listed separately in the file:
-python process_bioasq.py -pj
 """
 
 
@@ -32,10 +29,6 @@ def get_args():
                         dest="process",
                         action="store_true",
                         help="Process bioasq data")
-    parser.add_argument("-j",
-                        dest="join_snippets",
-                        action="store_true",
-                        help="Join the snippets from the same abstract")
     return parser
 
 
@@ -96,34 +89,14 @@ class BioASQ():
             # Then handle the snippets (the text extracted from the abstract)
             bioasq_collection[q['body']]['snippets'] = []
             snippet_dict[q['body']] = []
-            pmid_dict = {}
-            unique_abs_index = 0
             for snippet in q['snippets']:
                 pmid_match = False
                 snippet_dict[q['body']].append(snippet['text'])
                 doc_pmid = str(snippet['document'].split("/")[-1])
-                if args.join_snippets:
-                    # If the abstract has already been processed along with its snippet
-                    # find the location of that snippet so I can add a new snippet
-                    if doc_pmid in pmid_dict:
-                        pmid_match = True
-                        snippet_index = pmid_dict[doc_pmid]
-                    else:
-                        # Check to make sure the abstract was collected, because
-                        # if it wasn't, the code below will not add that abstract to the list,
-                        # unsurprisingly.
-                        if doc_pmid in articles:
-                            pmid_dict[doc_pmid] = unique_abs_index
-                            unique_abs_index += 1
                 try:
-                    if args.join_snippets and pmid_match:
-                        snippet_text = bioasq_collection[q['body']]['snippets'][snippet_index]['snippet']
-                        snippet_text += " " + snippet['text']
-                        bioasq_collection[q['body']]['snippets'][snippet_index]['snippet'] = snippet_text
-                    else:
-                        article = articles[doc_pmid]
-                        # Add the data to the dictionary containing the collection.
-                        bioasq_collection[q['body']]['snippets'].append({'snippet': snippet['text'], 'article': article, 'pmid': doc_pmid})
+                    article = articles[doc_pmid]
+                    # Add the data to the dictionary containing the collection.
+                    bioasq_collection[q['body']]['snippets'].append({'snippet': snippet['text'], 'article': article, 'pmid': doc_pmid})
                 except KeyError as e:
                     continue
 
@@ -131,12 +104,8 @@ class BioASQ():
             json.dump(ideal_answer_dict, f, indent=4)
         with open("data/bioasq_snippets.json", "w", encoding="utf8") as f:
             json.dump(snippet_dict, f, indent=4)
-        if args.join_snippets:
-            with open("data/bioasq_collection_with_joined_snippets.json", "w", encoding="utf8") as f:
-                json.dump(bioasq_collection, f, indent=4)
-        else:
-            with open("data/bioasq_collection.json", "w", encoding="utf8") as f:
-                json.dump(bioasq_collection, f, indent=4)
+        with open("data/bioasq_collection.json", "w", encoding="utf8") as f:
+            json.dump(bioasq_collection, f, indent=4)
 
     
 def process_bioasq():

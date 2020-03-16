@@ -6,3 +6,4 @@ sklearn
 py-rouge
 nltk
 tqdm
+openpyxl

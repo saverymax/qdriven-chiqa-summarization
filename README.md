@@ -57,11 +57,11 @@ It is optional to include the --add-q option if you are interested in training m
 
 To create the training data, the BioASQ data for training first has to be acquired. To do so, you have to register for an account at http://bioasq.org/participate.
 
-Once the bioasq data has been downloaded, it should be placed in the data_processing/data directory in the cloned github repository, so that the path relative to the data_processing directory looks like data_processing/data/BioASQ-training7b/BioASQ-training7b/training7b.json. Note that the version of BioASQ may be changed at the time of downloaded and this will have to be fixed in the code. 
+In the participants area of the website, you can find a list of all the datasets previously choosed for the BioASQ challenge. Download the 7b version of the task. Once the BioASQ data has been downloaded and unizpped, it should be placed in the data_processing/data directory in the cloned github repository, so that the path relative to the data_processing directory looks like ```data_processing/data/BioASQ-training7b/BioASQ-training7b/training7b.json```. Note that we used version 7b of BioASQ for training and testing. You are welcome to experiment with 8b or newer but will have to fix the paths in the code.
 
 Once the data is in the correct place, run the following scripts:
 ```
-python process_bioasq_data.py -p
+python process_bioasq.py -p
 python prepare_training_data.py -bt --bart-bioasq --bioasq-sent
 ```
 This will prepare separate training sets for the three deep learning models. Include the ```--add-q``` option to create additional datasets with the question concatenated to the beginning of the documents, for question-driven summarization. This step will take a while to finish. Once it is done, you are ready for training and inference.

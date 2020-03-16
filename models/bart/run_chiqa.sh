@@ -1,4 +1,5 @@
 #!/bin/bash
+# Include with_question or without_question when calling script
 model_config=bart_config/${1}/bart-bin
 model_path=checkpoints_bioasq_$1
 for summ_task in page2answer section2answer
