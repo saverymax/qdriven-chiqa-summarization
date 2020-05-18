@@ -105,12 +105,10 @@ def tokenize(summaries):
     return tokenized_summaries
 
 
-def compute_nltk_bleu(eval_name, eval_set):
+def compute_nltk_bleu(gold, guess):
     """
     Use NLTK to compute bleu score for up to 4 ngrams
     """
-    guess = eval_set[1]
-    gold = eval_set[0]
     # Each ref has to be a list of a list, as nltk likes to be able to count for multiple sentences per doc
     gold = [[g] for g in gold]
     bleu_score = nltk.translate.bleu_score.corpus_bleu(gold, guess)
@@ -259,7 +257,9 @@ def evaluate():
                                 rouge_dict["{l}_{t}".format(l=summ_task, t=summ_type)][eval_set] = rouge_scores
                     # Use nltk to calculate bleu
                     if args.calculate_bleu:
-                        bleu = compute_nltk_bleu(eval_set, data[eval_set])
+                        tokenized_gold = tokenize(data[eval_set][0])
+                        tokenized_guess = tokenize(data[eval_set][1])
+                        bleu = compute_nltk_bleu(tokenized_gold, tokenized_guess)
                         bleu_list.append(bleu)
 
                 table_dict = {
@@ -341,7 +341,9 @@ def evaluate():
 
                         # Use nltk to calculate bleu
                         if args.calculate_bleu:
-                            bleu = compute_nltk_bleu(eval_set, data[eval_set])
+                            tokenized_gold = tokenize(data[eval_set][0])
+                            tokenized_guess = tokenize(data[eval_set][1])
+                            bleu = compute_nltk_bleu(tokenized_gold, tokenized_guess)
                             bleu_list.append(bleu)
 
             # Save table for section task and page task
