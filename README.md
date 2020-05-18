@@ -95,11 +95,14 @@ Download BART into the models/bart directory in this repository.
 wget https://dl.fbaipublicfiles.com/fairseq/models/bart.large.tar.gz
 tar -xzvf bart.large.tar.gz
 ```
-Navigate to the models/bart directory and prepare an environment for BART. This also requires a few NVIDIA packages for optimized training.
+Navigate to the models/bart directory and prepare an environment for BART.
 ```
-conda create -n pytorch_env python=3.7 --file requirements.txt
+conda create -n pytorch_env python=3.7 pytorch_env pytorch torchvision cudatoolkit=10.1 -c pytorch
 conda activate pytorch_env
-conda install -n pytorch_env pytorch torchvision cudatoolkit=10.1 -c pytorch
+pip install -r requirements.txt
+```
+To use automatic mixed precision (optional), follow these steps once pytorch is installed:
+```
 conda install -n pytorch_env -c anaconda nccl
 git clone https://github.com/NVIDIA/apex
 cd apex
@@ -141,7 +144,7 @@ pip install tensorflow_gpu-1.2.0-cp36-cp36m-manylinux1_x86_64.whl
 pip install -r requirements.txt
 python -m spacy download en_core_web_sm
 ```
-The tensorflow 1.2.0 version is only availble via download from pypi.org, hence the use of ```wget``` first. To train the model, you will have to install cuDNN X and CUDA X. Once these are configured on your machine, you are ready for training.   
+The tensorflow 1.2.0 version is only availble via download from pypi.org, hence the use of ```wget``` first. To train the model, you will have to install cuDNN 5 and CUDA 8. Once these are configured on your machine, you are ready for training.   
 The Python 3 version of the Pointer-Generator code from https://github.com/becxer/pointer-generator/ (forked from https://github.com/abisee/pointer-generator) is provided in the models/pointer_generator directory here. The code has been customized to support answer summarization data processing steps, involving changes to data.py, batcher.py, decode.py, and run_summarization.py. However, the model (in model.py) remains the same.
 
 To use the Pointer-Generator, from the pointer_generator directory you will have to run 
