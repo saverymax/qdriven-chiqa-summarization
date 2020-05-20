@@ -1,5 +1,6 @@
 # Question-Driven Summarization of Answers to Consumer Health Questions
-This repository contains the code to process the data and run the answer summarization systems presented in the paper Question-Driven Summarization of Answers to Consumer Health Questions.      
+This repository contains the code to process the data and run the answer summarization systems presented in the paper Question-Driven Summarization of Answers to Consumer Health Questions, available at https://arxiv.org/abs/2005.09067.   
+
 If you are interested in just downloading the data, please refer to https://doi.org/10.17605/OSF.IO/FYG46. However, if you are interested in repeating the experiments reported in the paper, clone this repository and move the data found at https://doi.org/10.17605/OSF.IO/FYG46 to the evaluation/data directory.
 
 ## Environments
@@ -190,4 +191,14 @@ in the evaluation directory. This will generate the statistics reported in the p
 
 That's it! Thank you for using this code, and please contact us if you find any issues with the repository or have questions about summarization. If you publish work related to this project, please cite
 ```
-```
+@article{saverysumm,
+    title={Question-Driven Summarization of Answers to Consumer Health Questions},
+    author={Max Savery and Asma {Ben Abacha} and Soumya Gayen and Dina Demner{-}Fushman},
+    journal = {arXiv e-prints}, 
+    month = {May},
+    year={2020},
+    eprint={2005.09067},
+    archivePrefix={arXiv},
+    primaryClass={cs.CL}
+    url={https://arxiv.org/abs/2005.09067}
+}
