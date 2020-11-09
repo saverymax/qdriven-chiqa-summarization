@@ -1,5 +1,5 @@
 # Question-Driven Summarization of Answers to Consumer Health Questions
-This repository contains the code to process the data and run the answer summarization systems presented in the paper Question-Driven Summarization of Answers to Consumer Health Questions, available at https://arxiv.org/abs/2005.09067.   
+This repository contains the code to process the data and run the answer summarization systems presented in the paper Question-Driven Summarization of Answers to Consumer Health Questions, available at https://www.nature.com/articles/s41597-020-00667-z.   
 
 If you are interested in just downloading the data, please refer to https://doi.org/10.17605/OSF.IO/FYG46. However, if you are interested in repeating the experiments reported in the paper, clone this repository and move the data found at https://doi.org/10.17605/OSF.IO/FYG46 to the evaluation/data directory.
 
